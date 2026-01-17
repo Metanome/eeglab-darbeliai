@@ -16,7 +16,7 @@
 %
 % Ši programa platinama su viltimi, kad ji bus naudinga, bet BE JOKIOS
 % GARANTIJOS; taip pat nesuteikiama jokia numanoma garantija dėl TINKAMUMO
-% PARDUOTI ar PANAUDOTI TAM TIKRAM TIKSLU. Daugiau informacijos galite 
+% PARDUOTI ar PANAUDOTI TAM TIKRAM TIKSLU. Daugiau informacijos galite
 % rasti pačioje GNU Bendrojoje Viešojoje licencijoje.
 %
 % Jūs kartu su šia programa turėjote gauti ir GNU Bendrosios Viešosios
@@ -88,6 +88,7 @@ Doc_pvd=strrep(Doc_pvd,'%t',t);
 Rezultatu_MAT_failas=[Doc_pvd '.mat'] ;
 Rezultatu_TXT_failas=[Doc_pvd '.txt'] ; % galia
 Rezultatu_TXT_failas_sp = [ Doc_pvd '.sp.txt' ] ;
+Rezultatu_XLSX_failas=[Doc_pvd '.xlsx'] ; % Excel
 Rezultatu_Stjudento=[Doc_pvd '_Stjud.tsv'];
 Rezultatu_Stjudento_galvos=[Doc_pvd '_StjudGalvos.txt'];
 Rezultatu_Vilkoksono=[Doc_pvd '_Vilk.tsv'];
@@ -110,15 +111,15 @@ end;
 % Čia tik 48 kanalai:
 DUOMENYS.VISU.Kanalu_koordinates_galvose={ ...
     ...
-                          'Fp1' 3 1; 'Fpz' 4 1; 'Fp2' 5 1; ...
-                          'AF3' 3 2;            'AF4' 5 2; ...
+    'Fp1' 3 1; 'Fpz' 4 1; 'Fp2' 5 1; ...
+    'AF3' 3 2;            'AF4' 5 2; ...
     'F5'  1 3; 'F3'  2 3; 'F1'  3 3; 'Fz'  4 3; 'F2'  5 3; 'F4'  6 3; 'F6'  7 3; ...
     'FC5' 1 4; 'FC3' 2 4; 'FC1' 3 4; 'FCz' 4 4; 'FC2' 5 4; 'FC4' 6 4; 'FC6' 7 4; ...
     'C5'  1 5; 'C3'  2 5; 'C1'  3 5; 'Cz'  4 5; 'C2'  5 5; 'C4'  6 5; 'C6'  7 5; ...
     'CP5' 1 6; 'CP3' 2 6; 'CP1' 3 6; 'CPz' 4 6; 'CP2' 5 6; 'CP4' 6 6; 'CP6' 7 6; ...
     'P5'  1 7; 'P3'  2 7; 'P1'  3 7; 'Pz'  4 7; 'P2'  5 7; 'P4'  6 7; 'P6'  7 7; ...
     'PO5' 1 8; 'PO3' 2 8;            'POz' 4 8;            'PO4' 6 8; 'PO6' 7 8; ...
-                          'O1'  3 9; 'Oz'  4 9; 'O2'  5 9};
+    'O1'  3 9; 'Oz'  4 9; 'O2'  5 9};
 
 
 orig_path=pwd;
@@ -183,7 +184,7 @@ for i=1:NumberOfFiles ;
     disp(File);
 
     try
-    
+
         [KELIAS_,Rinkmena_]=rinkmenos_tikslinimas(PathName,File);
 
         if FilterIndex == 1 ;
@@ -196,24 +197,24 @@ for i=1:NumberOfFiles ;
         else
             EEG = eeg_ikelk(KELIAS_,Rinkmena_);
         end;
-        
+
         EEG = eeg_checkset( EEG );
-        
+
         if (EEG.xmax - EEG.xmin) < DUOMENYS.VISU.lango_ilgis_sekundemis ;
             error([lokaliz('Epocha trumpesne uz FFT lango ilgi!') ...
                 ' EEG.xmax-EEG.xmin=' num2str(EEG.xmax - EEG.xmin) 's, bet FFT langas' ...
                 num2str(DUOMENYS.VISU.lango_ilgis_sekundemis) ' s.']);
         end;
-        
+
         %if EEG.nbchan > 0;
-        
+
         if leisti_interpoliuoti;
             % Jei reikia – interpoliuok
             EEG = eeg_interpoliuok64(EEG, NORIMI_KANALAI);
             EEG = eeg_checkset( EEG );
         end;
-        
-        % Tikrinti, ar visi kanalai yra        
+
+        % Tikrinti, ar visi kanalai yra
         nesutampantys_kanalai=setdiff(DUOMENYS.VISU.NORIMI_KANALAI,{EEG.chanlocs(:).labels});
         if ~isempty(nesutampantys_kanalai);
             isp_prnsm=sprintf(' \n\n%s\n%s:\n %s\n%s\n%s\n%s %s\n', ...
@@ -226,7 +227,7 @@ for i=1:NumberOfFiles ;
             warning(isp_prnsm);
             warning(wrn.state, 'backtrace');
         end;
-        
+
         % Atrinkti kanalus
         try
             %EEG = pop_select( EEG,'channel',DUOMENYS.VISU.NORIMI_KANALAI);
@@ -235,7 +236,7 @@ for i=1:NumberOfFiles ;
             EEG = pop_select( EEG,'channel',intersect({EEG.chanlocs(:).labels},DUOMENYS.VISU.NORIMI_KANALAI));
         catch err; Pranesk_apie_klaida(err, 'EEG spektras', File, 0);
         end;
-        
+
         % Atmesti kanalus, kurie yra tiesi linija
         ne_tiesiosios_linijos=[];
         for knl=1:size(EEG.data,1);
@@ -249,24 +250,24 @@ for i=1:NumberOfFiles ;
         if length(ne_tiesiosios_linijos) ~= size(EEG.data,1);
             EEG = pop_select( EEG,'channel', {EEG.chanlocs(ne_tiesiosios_linijos).labels});
         end;
-        
+
         EEG = eeg_checkset( EEG );
-        
+
         if and(EEG.nbchan > 0, ~isempty(EEG.data));
-            
+
             if strcmp(AR_GRAFIKAS,'on');
                 set(0,'CurrentFigure',figure_id);
                 clf;
             end;
-            
+
             %try
-            
+
             %spectopo_daznis=[1 2 4 8 16 32 64 128 256 512 1024];
             %spectopo_daznis=spectopo_daznis(max(find(spectopo_daznis <= (EEG.srate/2) == 1)));
-            
+
             DUOMENYS.FAILO(i).KANALAI=DUOMENYS.VISU.NORIMI_KANALAI; %{EEG.chanlocs.labels}
             [~,Kanalu_sukeisti_id]=ismember({EEG.chanlocs.labels},DUOMENYS.VISU.NORIMI_KANALAI);
-            
+
             [DUOMENYS.FAILO(i).SPEKTRAS.dB(Kanalu_sukeisti_id,:),DUOMENYS.FAILO(i).DAZNIAI]= ...
                 pop_spectopo(EEG, 1, [EEG.times(1) EEG.times(end)], 'EEG',...
                 'percent',100,...
@@ -276,10 +277,10 @@ for i=1:NumberOfFiles ;
                 'overlap',EEG.srate*DUOMENYS.VISU.lango_ilgis_sekundemis*0.5,...
                 'nfft',EEG.srate*DUOMENYS.VISU.fft_tasku_herce,...
                 'plot',AR_GRAFIKAS );
-            
+
             [~,Kanalu_nesanciu_id]=ismember(nesutampantys_kanalai,DUOMENYS.VISU.NORIMI_KANALAI);
             DUOMENYS.FAILO(i).SPEKTRAS.dB(Kanalu_nesanciu_id,:)=nan(length(Kanalu_nesanciu_id),length(DUOMENYS.FAILO(i).DAZNIAI));
-            
+
             % 0.1*[0:(10*floor(EEG.srate/2))]
             %             'freqfac',10,...
             %         catch err;
@@ -301,8 +302,8 @@ for i=1:NumberOfFiles ;
             %         end;
             %         [DUOMENYS.FAILO(i).SPEKTRAS.dB,DUOMENYS.FAILO(i).DAZNIAI]= ...
             %         pop_spectopo(EEG, 1, [EEG.times(1) EEG.times(end)], 'EEG' , 'freq', [10], 'freqrange',[0 min(50,EEG.srate/2)],'electrodes','off','plot','off');
-            
-            
+
+
             DUOMENYS.FAILO(i).SPEKTRAS.absol=10.^(DUOMENYS.FAILO(i).SPEKTRAS.dB/10);
             DUOMENYS.FAILO(i).pavad=File;
             if analizuoti_pavadinima
@@ -333,7 +334,7 @@ for i=1:NumberOfFiles ;
                 DUOMENYS.FAILO(i).Tiriamojo_idx = length(DUOMENYS.VISU.Tiriamieji)+1;
                 DUOMENYS.VISU.Tiriamieji{DUOMENYS.FAILO(i).Tiriamojo_idx,1}=DUOMENYS.FAILO(i).Tiriamasis;
             end;
-            
+
             % Tiek tikrinti nereikia, bet gali praversti, jei interpoliuosime ir kanalai nesutaps
             if ~isfield(DUOMENYS.VISU, 'DAZNIAI');
                 DUOMENYS.VISU.DAZNIAI=DUOMENYS.FAILO(i).DAZNIAI;
@@ -354,29 +355,29 @@ for i=1:NumberOfFiles ;
             else
                 warning(['Nesutampa kanalai su kitų failų. ' File]);
             end;
-            
+
             % Isvalyti atminti
             STUDY = []; CURRENTSTUDY = 0; ALLEEG = []; EEG=[]; CURRENTSET=[];
-            
+
             %eeglab redraw;
-            
+
             str=(sprintf('Apdorotas %d/%d(%3.2f%%): %s\r\n', i, NumberOfFiles, i/NumberOfFiles*100, File )) ;
             disp(str);
             % Parodyk, kiek laiko uztruko
             %t=datestr(now, 'yyyy-mm-dd HH:MM:SS'); disp(t);
             %toc ;
-            
+
         end;
-        
+
     catch err;
         Pranesk_apie_klaida(err, 'EEG spektras', File, 0);
     end;
-    
+
 end ;
 
- if strcmp(AR_GRAFIKAS,'on');
-          close(figure_id) ;
- end;
+if strcmp(AR_GRAFIKAS,'on');
+    close(figure_id) ;
+end;
 
 % close all ;
 
@@ -399,8 +400,8 @@ DUOMENYS.VISU.Tiriamuju_N=length(DUOMENYS.VISU.Tiriamieji);
 
 try cd(NewPath);
 catch;
-    try cd(NewDir); 
-    catch; 
+    try cd(NewDir);
+    catch;
     end;
 end;
 
@@ -471,250 +472,250 @@ end;
 
 if and(0,(DUOMENYS.VISU.Salygu_N == 2)) ;
 
-%% Statistika – Stjudento ir Vilkoksono
-% Tarp (pirmu) dvieju salygu
-DUOMENYS.VISU.Statistika_Stjudento_absol_galiai={};
-DUOMENYS.VISU.Statistika_Stjudento_absol_galiai.h_galvai=[];
-DUOMENYS.VISU.Statistika_Vilkoksono_absol_galiai={};
-DUOMENYS.VISU.Statistika_Vilkoksono_absol_galiai.h_galvai=[];
-for i=1:DUOMENYS.VISU.Dazniu_sriciu_N;
+    %% Statistika – Stjudento ir Vilkoksono
+    % Tarp (pirmu) dvieju salygu
+    DUOMENYS.VISU.Statistika_Stjudento_absol_galiai={};
+    DUOMENYS.VISU.Statistika_Stjudento_absol_galiai.h_galvai=[];
+    DUOMENYS.VISU.Statistika_Vilkoksono_absol_galiai={};
+    DUOMENYS.VISU.Statistika_Vilkoksono_absol_galiai.h_galvai=[];
+    for i=1:DUOMENYS.VISU.Dazniu_sriciu_N;
 
-    DUOMENYS.VISU.Statistika_Stjudento_absol_galiai.h_galvai{i}(1:max([DUOMENYS.VISU.Kanalu_koordinates_galvose{:,3}]),1:max([DUOMENYS.VISU.Kanalu_koordinates_galvose{:,2}]))=' ';
-    DUOMENYS.VISU.Statistika_Vilkoksono_absol_galiai.h_galvai{i}(1:max([DUOMENYS.VISU.Kanalu_koordinates_galvose{:,3}]),1:max([DUOMENYS.VISU.Kanalu_koordinates_galvose{:,2}]))=' ';
+        DUOMENYS.VISU.Statistika_Stjudento_absol_galiai.h_galvai{i}(1:max([DUOMENYS.VISU.Kanalu_koordinates_galvose{:,3}]),1:max([DUOMENYS.VISU.Kanalu_koordinates_galvose{:,2}]))=' ';
+        DUOMENYS.VISU.Statistika_Vilkoksono_absol_galiai.h_galvai{i}(1:max([DUOMENYS.VISU.Kanalu_koordinates_galvose{:,3}]),1:max([DUOMENYS.VISU.Kanalu_koordinates_galvose{:,2}]))=' ';
 
-    for kan=1:DUOMENYS.VISU.KANALU_N;
-        kan_pav=DUOMENYS.VISU.KANALAI{kan};
-        galvoje=find(ismember(DUOMENYS.VISU.Kanalu_koordinates_galvose(:,1),kan_pav));
-        galvoje_x=DUOMENYS.VISU.Kanalu_koordinates_galvose{galvoje,2};
-        galvoje_y=DUOMENYS.VISU.Kanalu_koordinates_galvose{galvoje,3};
-        [DUOMENYS.VISU.Statistika_Stjudento_absol_galiai.h(i,kan), ...
-            DUOMENYS.VISU.Statistika_Stjudento_absol_galiai.p(i,kan), ...
-            DUOMENYS.VISU.Statistika_Stjudento_absol_galiai.PasInt{i,kan}, ...
-            DUOMENYS.VISU.Statistika_Stjudento_absol_galiai.stats{i,kan}] ...
-         = ttest(DUOMENYS.VISU.GALIA_Absol_dazniu_srityje{i,1}(:,kan),...
-            DUOMENYS.VISU.GALIA_Absol_dazniu_srityje{i,2}(:,kan), ...
-            0.05, 'both') ;
-        [DUOMENYS.VISU.Statistika_Stjudento_absol_galiai_l.h(i,kan), ...
-            DUOMENYS.VISU.Statistika_Stjudento_absol_galiai_l.p(i,kan), ...
-            DUOMENYS.VISU.Statistika_Stjudento_absol_galiai_l.PasInt{i,kan}, ...
-            DUOMENYS.VISU.Statistika_Stjudento_absol_galiai_l.stats{i,kan}] ...
-         = ttest(DUOMENYS.VISU.GALIA_Absol_dazniu_srityje{i,1}(:,kan),...
-            DUOMENYS.VISU.GALIA_Absol_dazniu_srityje{i,2}(:,kan), ...
-            0.05, 'left') ;
-        [DUOMENYS.VISU.Statistika_Stjudento_absol_galiai_r.h(i,kan), ...
-            DUOMENYS.VISU.Statistika_Stjudento_absol_galiai_r.p(i,kan), ...
-            DUOMENYS.VISU.Statistika_Stjudento_absol_galiai_r.PasInt{i,kan}, ...
-            DUOMENYS.VISU.Statistika_Stjudento_absol_galiai_r.stats{i,kan}] ...
-         = ttest(DUOMENYS.VISU.GALIA_Absol_dazniu_srityje{i,1}(:,kan),...
-            DUOMENYS.VISU.GALIA_Absol_dazniu_srityje{i,2}(:,kan), ...
-            0.05, 'right') ;
-        [DUOMENYS.VISU.Statistika_Vilkoksono_absol_galiai.p(i,kan), ...
-            DUOMENYS.VISU.Statistika_Vilkoksono_absol_galiai.h(i,kan), ...
-            DUOMENYS.VISU.Statistika_Vilkoksono_absol_galiai.stats{i,kan}] ...
-          = signrank(DUOMENYS.VISU.GALIA_Absol_dazniu_srityje{i,1}(:,kan), DUOMENYS.VISU.GALIA_Absol_dazniu_srityje{i,2}(:,kan), 'tail', 'both') ;
-        [DUOMENYS.VISU.Statistika_Vilkoksono_absol_galiai_l.p(i,kan), ...
-            DUOMENYS.VISU.Statistika_Vilkoksono_absol_galiai_l.h(i,kan), ...
-            DUOMENYS.VISU.Statistika_Vilkoksono_absol_galiai_l.stats{i,kan}] ...
-          = signrank(DUOMENYS.VISU.GALIA_Absol_dazniu_srityje{i,1}(:,kan), DUOMENYS.VISU.GALIA_Absol_dazniu_srityje{i,2}(:,kan), 'tail', 'left') ;
-        [DUOMENYS.VISU.Statistika_Vilkoksono_absol_galiai_r.p(i,kan), ...
-            DUOMENYS.VISU.Statistika_Vilkoksono_absol_galiai_r.h(i,kan), ...
-            DUOMENYS.VISU.Statistika_Vilkoksono_absol_galiai_r.stats{i,kan}] ...
-          = signrank(DUOMENYS.VISU.GALIA_Absol_dazniu_srityje{i,1}(:,kan), DUOMENYS.VISU.GALIA_Absol_dazniu_srityje{i,2}(:,kan), 'tail', 'right') ;
+        for kan=1:DUOMENYS.VISU.KANALU_N;
+            kan_pav=DUOMENYS.VISU.KANALAI{kan};
+            galvoje=find(ismember(DUOMENYS.VISU.Kanalu_koordinates_galvose(:,1),kan_pav));
+            galvoje_x=DUOMENYS.VISU.Kanalu_koordinates_galvose{galvoje,2};
+            galvoje_y=DUOMENYS.VISU.Kanalu_koordinates_galvose{galvoje,3};
+            [DUOMENYS.VISU.Statistika_Stjudento_absol_galiai.h(i,kan), ...
+                DUOMENYS.VISU.Statistika_Stjudento_absol_galiai.p(i,kan), ...
+                DUOMENYS.VISU.Statistika_Stjudento_absol_galiai.PasInt{i,kan}, ...
+                DUOMENYS.VISU.Statistika_Stjudento_absol_galiai.stats{i,kan}] ...
+                = ttest(DUOMENYS.VISU.GALIA_Absol_dazniu_srityje{i,1}(:,kan),...
+                DUOMENYS.VISU.GALIA_Absol_dazniu_srityje{i,2}(:,kan), ...
+                0.05, 'both') ;
+            [DUOMENYS.VISU.Statistika_Stjudento_absol_galiai_l.h(i,kan), ...
+                DUOMENYS.VISU.Statistika_Stjudento_absol_galiai_l.p(i,kan), ...
+                DUOMENYS.VISU.Statistika_Stjudento_absol_galiai_l.PasInt{i,kan}, ...
+                DUOMENYS.VISU.Statistika_Stjudento_absol_galiai_l.stats{i,kan}] ...
+                = ttest(DUOMENYS.VISU.GALIA_Absol_dazniu_srityje{i,1}(:,kan),...
+                DUOMENYS.VISU.GALIA_Absol_dazniu_srityje{i,2}(:,kan), ...
+                0.05, 'left') ;
+            [DUOMENYS.VISU.Statistika_Stjudento_absol_galiai_r.h(i,kan), ...
+                DUOMENYS.VISU.Statistika_Stjudento_absol_galiai_r.p(i,kan), ...
+                DUOMENYS.VISU.Statistika_Stjudento_absol_galiai_r.PasInt{i,kan}, ...
+                DUOMENYS.VISU.Statistika_Stjudento_absol_galiai_r.stats{i,kan}] ...
+                = ttest(DUOMENYS.VISU.GALIA_Absol_dazniu_srityje{i,1}(:,kan),...
+                DUOMENYS.VISU.GALIA_Absol_dazniu_srityje{i,2}(:,kan), ...
+                0.05, 'right') ;
+            [DUOMENYS.VISU.Statistika_Vilkoksono_absol_galiai.p(i,kan), ...
+                DUOMENYS.VISU.Statistika_Vilkoksono_absol_galiai.h(i,kan), ...
+                DUOMENYS.VISU.Statistika_Vilkoksono_absol_galiai.stats{i,kan}] ...
+                = signrank(DUOMENYS.VISU.GALIA_Absol_dazniu_srityje{i,1}(:,kan), DUOMENYS.VISU.GALIA_Absol_dazniu_srityje{i,2}(:,kan), 'tail', 'both') ;
+            [DUOMENYS.VISU.Statistika_Vilkoksono_absol_galiai_l.p(i,kan), ...
+                DUOMENYS.VISU.Statistika_Vilkoksono_absol_galiai_l.h(i,kan), ...
+                DUOMENYS.VISU.Statistika_Vilkoksono_absol_galiai_l.stats{i,kan}] ...
+                = signrank(DUOMENYS.VISU.GALIA_Absol_dazniu_srityje{i,1}(:,kan), DUOMENYS.VISU.GALIA_Absol_dazniu_srityje{i,2}(:,kan), 'tail', 'left') ;
+            [DUOMENYS.VISU.Statistika_Vilkoksono_absol_galiai_r.p(i,kan), ...
+                DUOMENYS.VISU.Statistika_Vilkoksono_absol_galiai_r.h(i,kan), ...
+                DUOMENYS.VISU.Statistika_Vilkoksono_absol_galiai_r.stats{i,kan}] ...
+                = signrank(DUOMENYS.VISU.GALIA_Absol_dazniu_srityje{i,1}(:,kan), DUOMENYS.VISU.GALIA_Absol_dazniu_srityje{i,2}(:,kan), 'tail', 'right') ;
 
-       % Stjudento
-       if DUOMENYS.VISU.Statistika_Stjudento_absol_galiai.h(i,kan) == 1 ;
-            if mean(DUOMENYS.VISU.GALIA_Absol_dazniu_srityje{i,1}(:,kan)) < ...
-                    mean(DUOMENYS.VISU.GALIA_Absol_dazniu_srityje{i,2}(:,kan));  ...
-                    galvoje_reiksme='+';
-            else galvoje_reiksme='-';
+            % Stjudento
+            if DUOMENYS.VISU.Statistika_Stjudento_absol_galiai.h(i,kan) == 1 ;
+                if mean(DUOMENYS.VISU.GALIA_Absol_dazniu_srityje{i,1}(:,kan)) < ...
+                        mean(DUOMENYS.VISU.GALIA_Absol_dazniu_srityje{i,2}(:,kan));  ...
+                        galvoje_reiksme='+';
+                else galvoje_reiksme='-';
+                end;
+
+                if     DUOMENYS.VISU.Statistika_Stjudento_absol_galiai_r.h(i,kan) == 1 ;
+                    galvoje_reiksme2='-' ;
+                elseif DUOMENYS.VISU.Statistika_Stjudento_absol_galiai_l.h(i,kan) == 1 ;
+                    galvoje_reiksme2='+' ;
+                else
+                    disp(['Vidinė klaida: i=' num2str(i) ', kan=' num2str(kan) ', turi būti ' galvoje_reiksme ', bet yra ' galvoje_reiksme2 ]);
+                end ;
+
+                DUOMENYS.VISU.Statistika_Stjudento_absol_galiai.h_galvai{i}(galvoje_y,galvoje_x)=galvoje_reiksme2;
+            else
+                DUOMENYS.VISU.Statistika_Stjudento_absol_galiai.h_galvai{i}(galvoje_y,galvoje_x)='.';
             end;
 
-            if     DUOMENYS.VISU.Statistika_Stjudento_absol_galiai_r.h(i,kan) == 1 ;
-                      galvoje_reiksme2='-' ;
-            elseif DUOMENYS.VISU.Statistika_Stjudento_absol_galiai_l.h(i,kan) == 1 ;
-                      galvoje_reiksme2='+' ;
+            % Vilkoksono
+            if DUOMENYS.VISU.Statistika_Vilkoksono_absol_galiai.h(i,kan) == 1 ;
+
+                if     DUOMENYS.VISU.Statistika_Vilkoksono_absol_galiai_r.h(i,kan) == 1 ;
+                    galvoje_reiksme3='-' ;
+                elseif DUOMENYS.VISU.Statistika_Vilkoksono_absol_galiai_l.h(i,kan) == 1 ;
+                    galvoje_reiksme3='+' ;
+                else
+                    disp(['Vidinė klaida: i=' num2str(i) ', kan=' num2str(kan)  ]);
+                end ;
+
+                DUOMENYS.VISU.Statistika_Vilkoksono_absol_galiai.h_galvai{i}(galvoje_y,galvoje_x)=galvoje_reiksme3;
             else
-                disp(['Vidinė klaida: i=' num2str(i) ', kan=' num2str(kan) ', turi būti ' galvoje_reiksme ', bet yra ' galvoje_reiksme2 ]);
-            end ;
-
-            DUOMENYS.VISU.Statistika_Stjudento_absol_galiai.h_galvai{i}(galvoje_y,galvoje_x)=galvoje_reiksme2;
-        else
-            DUOMENYS.VISU.Statistika_Stjudento_absol_galiai.h_galvai{i}(galvoje_y,galvoje_x)='.';
-        end;
-
-        % Vilkoksono
-        if DUOMENYS.VISU.Statistika_Vilkoksono_absol_galiai.h(i,kan) == 1 ;
-
-            if     DUOMENYS.VISU.Statistika_Vilkoksono_absol_galiai_r.h(i,kan) == 1 ;
-                      galvoje_reiksme3='-' ;
-            elseif DUOMENYS.VISU.Statistika_Vilkoksono_absol_galiai_l.h(i,kan) == 1 ;
-                      galvoje_reiksme3='+' ;
-            else
-                disp(['Vidinė klaida: i=' num2str(i) ', kan=' num2str(kan)  ]);
-            end ;
-
-            DUOMENYS.VISU.Statistika_Vilkoksono_absol_galiai.h_galvai{i}(galvoje_y,galvoje_x)=galvoje_reiksme3;
-        else
-            DUOMENYS.VISU.Statistika_Vilkoksono_absol_galiai.h_galvai{i}(galvoje_y,galvoje_x)='.';
-        end;
-
-
-    end;
-
-
-    % Stjud
-    fid=fopen(Rezultatu_Stjudento_galvos, 'a');
-    fprintf(fid, sprintf('\n%s\n', DUOMENYS.VISU.Dazniu_sriciu_pavadinimai{i}) );
-    for e=1:max([DUOMENYS.VISU.Kanalu_koordinates_galvose{:,3}]) ;
-        fwrite(fid, DUOMENYS.VISU.Statistika_Stjudento_absol_galiai.h_galvai{i}(e,:));
-        fprintf(fid, sprintf('\n'));
-    end;
-    fprintf(fid, sprintf('\n'));
-    fclose(fid);
-
-    %Vilkoksono
-    fid=fopen(Rezultatu_Vilkoksono_galvos, 'a');
-    fprintf(fid, sprintf('\n%s\n', DUOMENYS.VISU.Dazniu_sriciu_pavadinimai{i}) );
-    for e=1:max([DUOMENYS.VISU.Kanalu_koordinates_galvose{:,3}]) ;
-        fwrite(fid, DUOMENYS.VISU.Statistika_Vilkoksono_absol_galiai.h_galvai{i}(e,:));
-        fprintf(fid, sprintf('\n'));
-    end;
-    fprintf(fid, sprintf('\n'));
-    fclose(fid);
-
-
-end;
-
-DUOMENYS.VISU.Statistika_Stjudento_santyk_galiai={};
-DUOMENYS.VISU.Statistika_Stjudento_santyk_galiai.h_galvai=[];
-DUOMENYS.VISU.Statistika_Vilkoksono_santyk_galiai={};
-DUOMENYS.VISU.Statistika_Vilkoksono_santyk_galiai.h_galvai=[];
-for i=2:(DUOMENYS.VISU.Dazniu_sriciu_N + length(DUOMENYS.VISU.Papildomi_dazniu_santykiai));
-
-    DUOMENYS.VISU.Statistika_Stjudento_santyk_galiai.h_galvai{i}(1:max([DUOMENYS.VISU.Kanalu_koordinates_galvose{:,3}]),1:max([DUOMENYS.VISU.Kanalu_koordinates_galvose{:,2}]))=' ';
-    DUOMENYS.VISU.Statistika_Vilkoksono_santyk_galiai.h_galvai{i}(1:max([DUOMENYS.VISU.Kanalu_koordinates_galvose{:,3}]),1:max([DUOMENYS.VISU.Kanalu_koordinates_galvose{:,2}]))=' ';
-
-    for kan=1:DUOMENYS.VISU.KANALU_N;
-        kan_pav=DUOMENYS.VISU.KANALAI{kan};
-        galvoje=find(ismember(DUOMENYS.VISU.Kanalu_koordinates_galvose(:,1),kan_pav));
-        galvoje_x=DUOMENYS.VISU.Kanalu_koordinates_galvose{galvoje,2};
-        galvoje_y=DUOMENYS.VISU.Kanalu_koordinates_galvose{galvoje,3};
-        [DUOMENYS.VISU.Statistika_Stjudento_santyk_galiai.h(i,kan), ...
-            DUOMENYS.VISU.Statistika_Stjudento_santyk_galiai.p(i,kan), ...
-            DUOMENYS.VISU.Statistika_Stjudento_santyk_galiai.PasInt{i,kan}, ...
-            DUOMENYS.VISU.Statistika_Stjudento_santyk_galiai.stats{i,kan}] ...
-            = ttest(DUOMENYS.VISU.GALIA_Sant_dazniu_srityje{i,1}(:,kan),...
-            DUOMENYS.VISU.GALIA_Sant_dazniu_srityje{i,2}(:,kan), 0.05, 'both' ) ;
-        [DUOMENYS.VISU.Statistika_Stjudento_santyk_galiai_l.h(i,kan), ...
-            DUOMENYS.VISU.Statistika_Stjudento_santyk_galiai_l.p(i,kan), ...
-            DUOMENYS.VISU.Statistika_Stjudento_santyk_galiai_l.PasInt{i,kan}, ...
-            DUOMENYS.VISU.Statistika_Stjudento_santyk_galiai_l.stats{i,kan}] ...
-            = ttest(DUOMENYS.VISU.GALIA_Sant_dazniu_srityje{i,1}(:,kan),...
-            DUOMENYS.VISU.GALIA_Sant_dazniu_srityje{i,2}(:,kan), 0.05, 'left' ) ;
-        [DUOMENYS.VISU.Statistika_Stjudento_santyk_galiai_r.h(i,kan), ...
-            DUOMENYS.VISU.Statistika_Stjudento_santyk_galiai_r.p(i,kan), ...
-            DUOMENYS.VISU.Statistika_Stjudento_santyk_galiai_r.PasInt{i,kan}, ...
-            DUOMENYS.VISU.Statistika_Stjudento_santyk_galiai_r.stats{i,kan}] ...
-            = ttest(DUOMENYS.VISU.GALIA_Sant_dazniu_srityje{i,1}(:,kan),...
-            DUOMENYS.VISU.GALIA_Sant_dazniu_srityje{i,2}(:,kan), 0.05, 'right' ) ;
-        if DUOMENYS.VISU.Statistika_Stjudento_santyk_galiai.h(i,kan) == 1 ;
-            if mean(DUOMENYS.VISU.GALIA_Sant_dazniu_srityje{i,1}(:,kan)) < ...
-                    mean(DUOMENYS.VISU.GALIA_Sant_dazniu_srityje{i,2}(:,kan));  ...
-                    galvoje_reiksme='+';
-            else galvoje_reiksme='-';
+                DUOMENYS.VISU.Statistika_Vilkoksono_absol_galiai.h_galvai{i}(galvoje_y,galvoje_x)='.';
             end;
 
 
-            if     DUOMENYS.VISU.Statistika_Stjudento_santyk_galiai_r.h(i,kan) == 1 ;
-                      galvoje_reiksme2='-' ;
-            elseif DUOMENYS.VISU.Statistika_Stjudento_santyk_galiai_l.h(i,kan) == 1 ;
-                      galvoje_reiksme2='+' ;
-            else
-                disp(['Vidinė klaida: i=' num2str(i) ', kan=' num2str(kan) ', turi būti ' galvoje_reiksme ', bet yra ' galvoje_reiksme2 ]);
-            end ;
-
-
-
-            DUOMENYS.VISU.Statistika_Stjudento_santyk_galiai.h_galvai{i}(galvoje_y,galvoje_x)=galvoje_reiksme2;
-        else
-            DUOMENYS.VISU.Statistika_Stjudento_santyk_galiai.h_galvai{i}(galvoje_y,galvoje_x)='.';
         end;
 
 
+        % Stjud
+        fid=fopen(Rezultatu_Stjudento_galvos, 'a');
+        fprintf(fid, sprintf('\n%s\n', DUOMENYS.VISU.Dazniu_sriciu_pavadinimai{i}) );
+        for e=1:max([DUOMENYS.VISU.Kanalu_koordinates_galvose{:,3}]) ;
+            fwrite(fid, DUOMENYS.VISU.Statistika_Stjudento_absol_galiai.h_galvai{i}(e,:));
+            fprintf(fid, sprintf('\n'));
+        end;
+        fprintf(fid, sprintf('\n'));
+        fclose(fid);
+
+        %Vilkoksono
+        fid=fopen(Rezultatu_Vilkoksono_galvos, 'a');
+        fprintf(fid, sprintf('\n%s\n', DUOMENYS.VISU.Dazniu_sriciu_pavadinimai{i}) );
+        for e=1:max([DUOMENYS.VISU.Kanalu_koordinates_galvose{:,3}]) ;
+            fwrite(fid, DUOMENYS.VISU.Statistika_Vilkoksono_absol_galiai.h_galvai{i}(e,:));
+            fprintf(fid, sprintf('\n'));
+        end;
+        fprintf(fid, sprintf('\n'));
+        fclose(fid);
+
+
+    end;
+
+    DUOMENYS.VISU.Statistika_Stjudento_santyk_galiai={};
+    DUOMENYS.VISU.Statistika_Stjudento_santyk_galiai.h_galvai=[];
+    DUOMENYS.VISU.Statistika_Vilkoksono_santyk_galiai={};
+    DUOMENYS.VISU.Statistika_Vilkoksono_santyk_galiai.h_galvai=[];
+    for i=2:(DUOMENYS.VISU.Dazniu_sriciu_N + length(DUOMENYS.VISU.Papildomi_dazniu_santykiai));
+
+        DUOMENYS.VISU.Statistika_Stjudento_santyk_galiai.h_galvai{i}(1:max([DUOMENYS.VISU.Kanalu_koordinates_galvose{:,3}]),1:max([DUOMENYS.VISU.Kanalu_koordinates_galvose{:,2}]))=' ';
+        DUOMENYS.VISU.Statistika_Vilkoksono_santyk_galiai.h_galvai{i}(1:max([DUOMENYS.VISU.Kanalu_koordinates_galvose{:,3}]),1:max([DUOMENYS.VISU.Kanalu_koordinates_galvose{:,2}]))=' ';
+
+        for kan=1:DUOMENYS.VISU.KANALU_N;
+            kan_pav=DUOMENYS.VISU.KANALAI{kan};
+            galvoje=find(ismember(DUOMENYS.VISU.Kanalu_koordinates_galvose(:,1),kan_pav));
+            galvoje_x=DUOMENYS.VISU.Kanalu_koordinates_galvose{galvoje,2};
+            galvoje_y=DUOMENYS.VISU.Kanalu_koordinates_galvose{galvoje,3};
+            [DUOMENYS.VISU.Statistika_Stjudento_santyk_galiai.h(i,kan), ...
+                DUOMENYS.VISU.Statistika_Stjudento_santyk_galiai.p(i,kan), ...
+                DUOMENYS.VISU.Statistika_Stjudento_santyk_galiai.PasInt{i,kan}, ...
+                DUOMENYS.VISU.Statistika_Stjudento_santyk_galiai.stats{i,kan}] ...
+                = ttest(DUOMENYS.VISU.GALIA_Sant_dazniu_srityje{i,1}(:,kan),...
+                DUOMENYS.VISU.GALIA_Sant_dazniu_srityje{i,2}(:,kan), 0.05, 'both' ) ;
+            [DUOMENYS.VISU.Statistika_Stjudento_santyk_galiai_l.h(i,kan), ...
+                DUOMENYS.VISU.Statistika_Stjudento_santyk_galiai_l.p(i,kan), ...
+                DUOMENYS.VISU.Statistika_Stjudento_santyk_galiai_l.PasInt{i,kan}, ...
+                DUOMENYS.VISU.Statistika_Stjudento_santyk_galiai_l.stats{i,kan}] ...
+                = ttest(DUOMENYS.VISU.GALIA_Sant_dazniu_srityje{i,1}(:,kan),...
+                DUOMENYS.VISU.GALIA_Sant_dazniu_srityje{i,2}(:,kan), 0.05, 'left' ) ;
+            [DUOMENYS.VISU.Statistika_Stjudento_santyk_galiai_r.h(i,kan), ...
+                DUOMENYS.VISU.Statistika_Stjudento_santyk_galiai_r.p(i,kan), ...
+                DUOMENYS.VISU.Statistika_Stjudento_santyk_galiai_r.PasInt{i,kan}, ...
+                DUOMENYS.VISU.Statistika_Stjudento_santyk_galiai_r.stats{i,kan}] ...
+                = ttest(DUOMENYS.VISU.GALIA_Sant_dazniu_srityje{i,1}(:,kan),...
+                DUOMENYS.VISU.GALIA_Sant_dazniu_srityje{i,2}(:,kan), 0.05, 'right' ) ;
+            if DUOMENYS.VISU.Statistika_Stjudento_santyk_galiai.h(i,kan) == 1 ;
+                if mean(DUOMENYS.VISU.GALIA_Sant_dazniu_srityje{i,1}(:,kan)) < ...
+                        mean(DUOMENYS.VISU.GALIA_Sant_dazniu_srityje{i,2}(:,kan));  ...
+                        galvoje_reiksme='+';
+                else galvoje_reiksme='-';
+                end;
+
+
+                if     DUOMENYS.VISU.Statistika_Stjudento_santyk_galiai_r.h(i,kan) == 1 ;
+                    galvoje_reiksme2='-' ;
+                elseif DUOMENYS.VISU.Statistika_Stjudento_santyk_galiai_l.h(i,kan) == 1 ;
+                    galvoje_reiksme2='+' ;
+                else
+                    disp(['Vidinė klaida: i=' num2str(i) ', kan=' num2str(kan) ', turi būti ' galvoje_reiksme ', bet yra ' galvoje_reiksme2 ]);
+                end ;
 
 
 
-
-        [DUOMENYS.VISU.Statistika_Vilkoksono_santyk_galiai.p(i,kan), ...
-            DUOMENYS.VISU.Statistika_Vilkoksono_santyk_galiai.h(i,kan), ...
-            DUOMENYS.VISU.Statistika_Vilkoksono_santyk_galiai.stats{i,kan}] ...
-            = signrank(DUOMENYS.VISU.GALIA_Sant_dazniu_srityje{i,1}(:,kan),...
-            DUOMENYS.VISU.GALIA_Sant_dazniu_srityje{i,2}(:,kan), 'tail', 'both' ) ;
-        [DUOMENYS.VISU.Statistika_Vilkoksono_santyk_galiai_l.p(i,kan), ...
-            DUOMENYS.VISU.Statistika_Vilkoksono_santyk_galiai_l.h(i,kan), ...
-            DUOMENYS.VISU.Statistika_Vilkoksono_santyk_galiai_l.stats{i,kan}] ...
-            = signrank(DUOMENYS.VISU.GALIA_Sant_dazniu_srityje{i,1}(:,kan),...
-            DUOMENYS.VISU.GALIA_Sant_dazniu_srityje{i,2}(:,kan), 'tail', 'left' ) ;
-        [DUOMENYS.VISU.Statistika_Vilkoksono_santyk_galiai_r.p(i,kan), ...
-            DUOMENYS.VISU.Statistika_Vilkoksono_santyk_galiai_r.h(i,kan), ...
-            DUOMENYS.VISU.Statistika_Vilkoksono_santyk_galiai_r.stats{i,kan}] ...
-            = signrank(DUOMENYS.VISU.GALIA_Sant_dazniu_srityje{i,1}(:,kan),...
-            DUOMENYS.VISU.GALIA_Sant_dazniu_srityje{i,2}(:,kan), 'tail', 'right' ) ;
-        if DUOMENYS.VISU.Statistika_Vilkoksono_santyk_galiai.h(i,kan) == 1 ;
-
-            if     DUOMENYS.VISU.Statistika_Vilkoksono_santyk_galiai_r.h(i,kan) == 1 ;
-                      galvoje_reiksme3='-' ;
-            elseif DUOMENYS.VISU.Statistika_Vilkoksono_santyk_galiai_l.h(i,kan) == 1 ;
-                      galvoje_reiksme3='+' ;
+                DUOMENYS.VISU.Statistika_Stjudento_santyk_galiai.h_galvai{i}(galvoje_y,galvoje_x)=galvoje_reiksme2;
             else
-                disp(['Vidinė klaida: i=' num2str(i) ', kan=' num2str(kan) ]);
-            end ;
+                DUOMENYS.VISU.Statistika_Stjudento_santyk_galiai.h_galvai{i}(galvoje_y,galvoje_x)='.';
+            end;
 
 
 
-            DUOMENYS.VISU.Statistika_Vilkoksono_santyk_galiai.h_galvai{i}(galvoje_y,galvoje_x)=galvoje_reiksme3;
-        else
-            DUOMENYS.VISU.Statistika_Vilkoksono_santyk_galiai.h_galvai{i}(galvoje_y,galvoje_x)='.';
+
+
+
+            [DUOMENYS.VISU.Statistika_Vilkoksono_santyk_galiai.p(i,kan), ...
+                DUOMENYS.VISU.Statistika_Vilkoksono_santyk_galiai.h(i,kan), ...
+                DUOMENYS.VISU.Statistika_Vilkoksono_santyk_galiai.stats{i,kan}] ...
+                = signrank(DUOMENYS.VISU.GALIA_Sant_dazniu_srityje{i,1}(:,kan),...
+                DUOMENYS.VISU.GALIA_Sant_dazniu_srityje{i,2}(:,kan), 'tail', 'both' ) ;
+            [DUOMENYS.VISU.Statistika_Vilkoksono_santyk_galiai_l.p(i,kan), ...
+                DUOMENYS.VISU.Statistika_Vilkoksono_santyk_galiai_l.h(i,kan), ...
+                DUOMENYS.VISU.Statistika_Vilkoksono_santyk_galiai_l.stats{i,kan}] ...
+                = signrank(DUOMENYS.VISU.GALIA_Sant_dazniu_srityje{i,1}(:,kan),...
+                DUOMENYS.VISU.GALIA_Sant_dazniu_srityje{i,2}(:,kan), 'tail', 'left' ) ;
+            [DUOMENYS.VISU.Statistika_Vilkoksono_santyk_galiai_r.p(i,kan), ...
+                DUOMENYS.VISU.Statistika_Vilkoksono_santyk_galiai_r.h(i,kan), ...
+                DUOMENYS.VISU.Statistika_Vilkoksono_santyk_galiai_r.stats{i,kan}] ...
+                = signrank(DUOMENYS.VISU.GALIA_Sant_dazniu_srityje{i,1}(:,kan),...
+                DUOMENYS.VISU.GALIA_Sant_dazniu_srityje{i,2}(:,kan), 'tail', 'right' ) ;
+            if DUOMENYS.VISU.Statistika_Vilkoksono_santyk_galiai.h(i,kan) == 1 ;
+
+                if     DUOMENYS.VISU.Statistika_Vilkoksono_santyk_galiai_r.h(i,kan) == 1 ;
+                    galvoje_reiksme3='-' ;
+                elseif DUOMENYS.VISU.Statistika_Vilkoksono_santyk_galiai_l.h(i,kan) == 1 ;
+                    galvoje_reiksme3='+' ;
+                else
+                    disp(['Vidinė klaida: i=' num2str(i) ', kan=' num2str(kan) ]);
+                end ;
+
+
+
+                DUOMENYS.VISU.Statistika_Vilkoksono_santyk_galiai.h_galvai{i}(galvoje_y,galvoje_x)=galvoje_reiksme3;
+            else
+                DUOMENYS.VISU.Statistika_Vilkoksono_santyk_galiai.h_galvai{i}(galvoje_y,galvoje_x)='.';
+            end;
+
+
         end;
 
 
-    end;
-
-
-    % Stjudento galvos
-    fid=fopen(Rezultatu_Stjudento_galvos, 'a');
-    if i <= DUOMENYS.VISU.Dazniu_sriciu_N ;
-        fprintf(fid, sprintf('\n%s\n', [DUOMENYS.VISU.Dazniu_sriciu_pavadinimai{i} skyriklis ...
-              DUOMENYS.VISU.Dazniu_sriciu_pavadinimai{1}]));
-    else
-        fprintf(fid, sprintf('\n%s\n', cell2mat([DUOMENYS.VISU.Dazniu_sriciu_pavadinimai(DUOMENYS.VISU.Papildomi_dazniu_santykiai{i-DUOMENYS.VISU.Dazniu_sriciu_N}(1)) ' / ' ...
-              DUOMENYS.VISU.Dazniu_sriciu_pavadinimai(DUOMENYS.VISU.Papildomi_dazniu_santykiai{i-DUOMENYS.VISU.Dazniu_sriciu_N}(2)) ]))) ;
-    end;
-    for e=1:max([DUOMENYS.VISU.Kanalu_koordinates_galvose{:,3}]) ;
-        fwrite(fid, DUOMENYS.VISU.Statistika_Stjudento_santyk_galiai.h_galvai{i}(e,:));
+        % Stjudento galvos
+        fid=fopen(Rezultatu_Stjudento_galvos, 'a');
+        if i <= DUOMENYS.VISU.Dazniu_sriciu_N ;
+            fprintf(fid, sprintf('\n%s\n', [DUOMENYS.VISU.Dazniu_sriciu_pavadinimai{i} skyriklis ...
+                DUOMENYS.VISU.Dazniu_sriciu_pavadinimai{1}]));
+        else
+            fprintf(fid, sprintf('\n%s\n', cell2mat([DUOMENYS.VISU.Dazniu_sriciu_pavadinimai(DUOMENYS.VISU.Papildomi_dazniu_santykiai{i-DUOMENYS.VISU.Dazniu_sriciu_N}(1)) ' / ' ...
+                DUOMENYS.VISU.Dazniu_sriciu_pavadinimai(DUOMENYS.VISU.Papildomi_dazniu_santykiai{i-DUOMENYS.VISU.Dazniu_sriciu_N}(2)) ]))) ;
+        end;
+        for e=1:max([DUOMENYS.VISU.Kanalu_koordinates_galvose{:,3}]) ;
+            fwrite(fid, DUOMENYS.VISU.Statistika_Stjudento_santyk_galiai.h_galvai{i}(e,:));
+            fprintf(fid, sprintf('\n'));
+        end;
         fprintf(fid, sprintf('\n'));
-    end;
-    fprintf(fid, sprintf('\n'));
-    fclose(fid);
+        fclose(fid);
 
 
-    % Vilkoksono galvos
-    fid=fopen(Rezultatu_Vilkoksono_galvos, 'a');
-    if i <= DUOMENYS.VISU.Dazniu_sriciu_N ;
-        fprintf(fid, sprintf('\n%s\n', [DUOMENYS.VISU.Dazniu_sriciu_pavadinimai{i} skyriklis ...
-              DUOMENYS.VISU.Dazniu_sriciu_pavadinimai{1}]));
-    else
-        fprintf(fid, sprintf('\n%s\n', cell2mat([DUOMENYS.VISU.Dazniu_sriciu_pavadinimai(DUOMENYS.VISU.Papildomi_dazniu_santykiai{i-DUOMENYS.VISU.Dazniu_sriciu_N}(1)) ' / ' ...
-              DUOMENYS.VISU.Dazniu_sriciu_pavadinimai(DUOMENYS.VISU.Papildomi_dazniu_santykiai{i-DUOMENYS.VISU.Dazniu_sriciu_N}(2)) ]))) ;
-    end;
-    for e=1:max([DUOMENYS.VISU.Kanalu_koordinates_galvose{:,3}]) ;
-        fwrite(fid, DUOMENYS.VISU.Statistika_Vilkoksono_santyk_galiai.h_galvai{i}(e,:));
+        % Vilkoksono galvos
+        fid=fopen(Rezultatu_Vilkoksono_galvos, 'a');
+        if i <= DUOMENYS.VISU.Dazniu_sriciu_N ;
+            fprintf(fid, sprintf('\n%s\n', [DUOMENYS.VISU.Dazniu_sriciu_pavadinimai{i} skyriklis ...
+                DUOMENYS.VISU.Dazniu_sriciu_pavadinimai{1}]));
+        else
+            fprintf(fid, sprintf('\n%s\n', cell2mat([DUOMENYS.VISU.Dazniu_sriciu_pavadinimai(DUOMENYS.VISU.Papildomi_dazniu_santykiai{i-DUOMENYS.VISU.Dazniu_sriciu_N}(1)) ' / ' ...
+                DUOMENYS.VISU.Dazniu_sriciu_pavadinimai(DUOMENYS.VISU.Papildomi_dazniu_santykiai{i-DUOMENYS.VISU.Dazniu_sriciu_N}(2)) ]))) ;
+        end;
+        for e=1:max([DUOMENYS.VISU.Kanalu_koordinates_galvose{:,3}]) ;
+            fwrite(fid, DUOMENYS.VISU.Statistika_Vilkoksono_santyk_galiai.h_galvai{i}(e,:));
+            fprintf(fid, sprintf('\n'));
+        end;
         fprintf(fid, sprintf('\n'));
-    end;
-    fprintf(fid, sprintf('\n'));
-    fclose(fid);
+        fclose(fid);
 
-end;
+    end;
 
 
 end;
@@ -735,9 +736,9 @@ disp('Saugomi duomenys...');
 disp( [ '[' pwd ']' ] );
 
 if ~(isempty(find(ismember(Doc_tp, {'txt','TXT'})))) && ( Ar_reikia_galios_absoliucios || Ar_reikia_galios_santykines );
-    
+
     %% Rezultatų po Stjudento eksportavimas
-    
+
     if and(0,DUOMENYS.VISU.Salygu_N == 2) ;
         disp(Rezultatu_Stjudento);
         fid=fopen(Rezultatu_Stjudento, 'w');
@@ -782,10 +783,10 @@ if ~(isempty(find(ismember(Doc_tp, {'txt','TXT'})))) && ( Ar_reikia_galios_absol
         end ;
         fprintf(fid, sprintf('\n'));
         fclose(fid);
-        
-        
+
+
         %% Rezultatų po Vilkoksono eksportavimas
-        
+
         fid=fopen(Rezultatu_Vilkoksono, 'w');
         disp(Rezultatu_Vilkoksono);
         % Antraštė
@@ -829,10 +830,10 @@ if ~(isempty(find(ismember(Doc_tp, {'txt','TXT'})))) && ( Ar_reikia_galios_absol
         end ;
         fprintf(fid, sprintf('\n'));
         fclose(fid);
-        
+
     end ;
-    
-    
+
+
     %% Spektrinės galios eksportavimas į tekstinį failą
     disp([ Rezultatu_TXT_failas ' (galite atverti su MS Excel ar LibreOffice Calc)' ] );
     fid=fopen(Rezultatu_TXT_failas, 'w');
@@ -891,7 +892,7 @@ if ~(isempty(find(ismember(Doc_tp, {'txt','TXT'})))) && ( Ar_reikia_galios_absol
         end;
     end;
     fclose(fid);
-    
+
     try
         if exist(Rezultatu_TXT_failas,'file') == 2;
             open(Rezultatu_TXT_failas);
@@ -899,12 +900,12 @@ if ~(isempty(find(ismember(Doc_tp, {'txt','TXT'})))) && ( Ar_reikia_galios_absol
     catch err;
         warning(err.message);
     end;
-    
+
 end;
 
 
 if ~(isempty(find(ismember(Doc_tp, {'txt','TXT'})))) && ( Ar_reikia_spekro_absol || Ar_reikia_spekro_db );
-    
+
     %% Spektro eksportavimas į tekstinį failą
     disp([ Rezultatu_TXT_failas_sp ' (galite atverti su MS Excel ar LibreOffice Calc)' ] );
     fid=fopen(Rezultatu_TXT_failas_sp, 'w');
@@ -922,7 +923,7 @@ if ~(isempty(find(ismember(Doc_tp, {'txt','TXT'})))) && ( Ar_reikia_spekro_absol
     elseif ismember(fft_tasku_herce, [2 5 10]);
         hz_sar_trpmn = 1 ;
     elseif fft_tasku_herce < 10 || ismember(fft_tasku_herce, [20 50 100]);
-        hz_sar_trpmn = 2 ; 
+        hz_sar_trpmn = 2 ;
     else
         hz_sar_trpmn = 1 + length(num2str(fft_tasku_herce)) ;
     end;
@@ -951,8 +952,8 @@ if ~(isempty(find(ismember(Doc_tp, {'txt','TXT'})))) && ( Ar_reikia_spekro_absol
             end;
         end;
     end;
-    fclose(fid);    
-    
+    fclose(fid);
+
     try
         if exist(Rezultatu_TXT_failas_sp,'file') == 2;
             open(Rezultatu_TXT_failas_sp);
@@ -960,14 +961,92 @@ if ~(isempty(find(ismember(Doc_tp, {'txt','TXT'})))) && ( Ar_reikia_spekro_absol
     catch err;
         warning(err.message);
     end;
-    
+
 end;
 
 
 %% Išsaugoti į MAT
 if ~(isempty(find(ismember(Doc_tp, {'mat','MAT', 'matlab','MATLAB'}))));
-disp(Rezultatu_MAT_failas);
-save( Rezultatu_MAT_failas , 'DUOMENYS') ;
+    disp(Rezultatu_MAT_failas);
+    save( Rezultatu_MAT_failas , 'DUOMENYS') ;
+end;
+
+%% Išsaugoti į XLSX (Excel)
+if ~(isempty(find(ismember(Doc_tp, {'xlsx','xls','XLSX','XLS','excel','Excel'})))) && ( Ar_reikia_galios_absoliucios || Ar_reikia_galios_santykines );
+    disp([ Rezultatu_XLSX_failas ' (' lokaliz('Excel') ')' ] );
+
+    % Paruošti duomenis lentelei
+    xlsx_data = {};
+    xlsx_row = 1;
+
+    % Antraštė
+    if exist('lokaliz.m','file') == 2;
+        xlsx_header = [{lokaliz('Rinkmena')} {lokaliz('Salyga')} {lokaliz('Freq_int_name')} {lokaliz('Freq_interval')} DUOMENYS.VISU.NORIMI_KANALAI(:)'];
+    else
+        xlsx_header = [{'Rinkmena'} {'Salyga'} {'Dazniu_int_pav'} {'Dazniu_interv'} DUOMENYS.VISU.NORIMI_KANALAI(:)'];
+    end;
+
+    for tir=1:DUOMENYS.VISU.Tiriamuju_N ;
+        for sal=1:DUOMENYS.VISU.Salygu_N ;
+            % Absoliučios galios
+            if Ar_reikia_galios_absoliucios;
+                for i=1:DUOMENYS.VISU.Dazniu_sriciu_N;
+                    xlsx_data(xlsx_row,:) = [ ...
+                        {DUOMENYS.VISU.Tiriamieji{tir}} ...
+                        {sal} ...
+                        {DUOMENYS.VISU.Dazniu_sriciu_pavadinimai{i}} ...
+                        {[num2str(DUOMENYS.VISU.Dazniu_sritys{i}(1)) '_' num2str(DUOMENYS.VISU.Dazniu_sritys{i}(2))]} ...
+                        num2cell(DUOMENYS.VISU.GALIA_Absol_dazniu_srityje{i,sal}(tir,:)) ];
+                    xlsx_row = xlsx_row + 1;
+                end;
+            end;
+            % Santykinės galios
+            if Ar_reikia_galios_santykines;
+                for i=2:(DUOMENYS.VISU.Dazniu_sriciu_N + length(DUOMENYS.VISU.Papildomi_dazniu_santykiai));
+                    if i <= DUOMENYS.VISU.Dazniu_sriciu_N ;
+                        pav = [DUOMENYS.VISU.Dazniu_sriciu_pavadinimai{i} skyriklis DUOMENYS.VISU.Dazniu_sriciu_pavadinimai{1}];
+                        interv = [num2str(DUOMENYS.VISU.Dazniu_sritys{i}(1)) '_' num2str(DUOMENYS.VISU.Dazniu_sritys{i}(2)) skyriklis ...
+                            num2str(DUOMENYS.VISU.Dazniu_sritys{1}(1)) '_' num2str(DUOMENYS.VISU.Dazniu_sritys{1}(2))];
+                    else
+                        e=DUOMENYS.VISU.Papildomi_dazniu_santykiai{i-DUOMENYS.VISU.Dazniu_sriciu_N};
+                        pav = [DUOMENYS.VISU.Dazniu_sriciu_pavadinimai{e(1)} skyriklis DUOMENYS.VISU.Dazniu_sriciu_pavadinimai{e(2)}];
+                        interv = [num2str(DUOMENYS.VISU.Dazniu_sritys{e(1)}(1)) '_' num2str(DUOMENYS.VISU.Dazniu_sritys{e(1)}(2)) skyriklis ...
+                            num2str(DUOMENYS.VISU.Dazniu_sritys{e(2)}(1)) '_' num2str(DUOMENYS.VISU.Dazniu_sritys{e(2)}(2))];
+                    end;
+                    xlsx_data(xlsx_row,:) = [ ...
+                        {DUOMENYS.VISU.Tiriamieji{tir}} ...
+                        {sal} ...
+                        {pav} ...
+                        {interv} ...
+                        num2cell(DUOMENYS.VISU.GALIA_Sant_dazniu_srityje{i,sal}(tir,:)) ];
+                    xlsx_row = xlsx_row + 1;
+                end;
+            end;
+        end;
+    end;
+
+    % Sukurti lentelę ir išsaugoti
+    try
+        T = cell2table(xlsx_data, 'VariableNames', matlab.lang.makeValidName(xlsx_header));
+        writetable(T, Rezultatu_XLSX_failas);
+    catch err;
+        % Atsarginis variantas senesnėms MATLAB versijoms
+        warning(err.message);
+        try
+            xlswrite(Rezultatu_XLSX_failas, [xlsx_header; xlsx_data]);
+        catch err2;
+            warning([lokaliz('Excel export failed') ': ' err2.message]);
+        end;
+    end;
+
+    try
+        if exist(Rezultatu_XLSX_failas,'file') == 2;
+            open(Rezultatu_XLSX_failas);
+        end
+    catch err;
+        warning(err.message);
+    end;
+
 end;
 
 try delete([Rezultatu_MAT_failas '~']) ; catch; end;
@@ -982,11 +1061,11 @@ disp('Atlikta!');
 
 
 function [varargout] = Tikras_Kelias(kelias_tikrinimui)
-kelias_dabar=pwd;
-try
-    cd(kelias_tikrinimui);
-catch err;
-end;
-varargout{1}=pwd;
-cd(kelias_dabar);
+    kelias_dabar=pwd;
+    try
+        cd(kelias_tikrinimui);
+    catch err;
+    end;
+    varargout{1}=pwd;
+    cd(kelias_dabar);
 

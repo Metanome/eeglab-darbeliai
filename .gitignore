@@ -1,0 +1,16 @@
+# User configuration (created at runtime)
+Darbeliai_config.mat
+Darbeliai_config.bak
+
+# Encoding-converted directories (created at runtime for non-UTF-8 systems)
+windows-1257/
+windows-1250/
+ISO-8859-*/
+
+# Temporary/backup files
+*.mat~
+*~
+*.asv
+
+# MATLAB generated
+*.m~

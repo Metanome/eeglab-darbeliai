@@ -1,100 +1,100 @@
-% eegplugin_darbeliai() 
-% EEGLAB papildinys duomenu rinkiniu apdorojimui patogioje grafineje aplinkoje.
+% eegplugin_darbeliai()
+% EEGLAB papildinys duomenų rinkinių apdorojimui patogioje grafinėje aplinkoje.
 %
 %
-% Pagrindines grafines sasajos programos:
+% Pagrindinės grafinės sąsajos programos:
 % --
-% <a href="matlab:helpwin pop_pervadinimas">pop_pervadinimas</a> - failu pervadinimui;
+% <a href="matlab:helpwin pop_pervadinimas">pop_pervadinimas</a> - failų pervadinimui;
 % <a href="matlab:helpwin pop_nuoseklus_apdorojimas">pop_nuoseklus_apdorojimas</a> - EEG apdorojimo darbai;
-% <a href="matlab:helpwin pop_RRI_perziura">pop_RRI_perziura</a> - QRS laiku, RRI kreiviu, EKG perziurejimas ir koregavimas;
-% <a href="matlab:helpwin pop_Epochavimas_ir_atrinkimas">Epochavimas_ir_atrinkimas</a> - epochavimas su salyga, kad yra kito tipo ivykis;
-% <a href="matlab:helpwin pop_ERP_savybes">pop_ERP_savybes</a> - su ivykiu susijusiu potencialu (SISP) tyrinejimas;
+% <a href="matlab:helpwin pop_RRI_perziura">pop_RRI_perziura</a> - QRS laikų, RRI kreivių, EKG peržiūrėjimas ir koregavimas;
+% <a href="matlab:helpwin pop_Epochavimas_ir_atrinkimas">Epochavimas_ir_atrinkimas</a> - epochavimas su sąlyga, kad yra kito tipo įvykis;
+% <a href="matlab:helpwin pop_ERP_savybes">pop_ERP_savybes</a> - su įvykių susijusių potencialų (SĮSP) tyrinėjimas;
 %
 %
-% Kitos grafines sasajos programeles:
+% Kitos grafinės sąsajos programėlės:
 % --
-% <a href="matlab:helpwin konfig">konfig</a> - Darbeliu atnaujinimo ir kalbos nuostatos; saugomos <a href="matlab:load Darbeliai_config.mat">Darbeliai_config.mat</a>;
+% <a href="matlab:helpwin konfig">konfig</a> - „Darbelių“ atnaujinimo ir kalbos nuostatos; saugomos <a href="matlab:load Darbeliai_config.mat">Darbeliai_config.mat</a>;
 % <a href="matlab:helpwin pop_atnaujinimas">pop_atnaujinimas</a> - atnaujinimo dialogas;
 % <a href="matlab:helpwin pop_QRS_i_EEG">pop_QRS_i_EEG</a> - kardiograma elektroencefalogramoje;
 %
 %
-% Pagalbines funkcijos, taciau paleistos be argumentu, paprasys pasirinkti apdorotinus irasus:
+% Pagalbinės funkcijos, tačiau paleistos be argumentų, paprašys pasirinkti apdorotinus įrašus:
 % --
-% <a href="matlab:helpwin atmest_pg_amplit">atmest_pg_amplit</a> - artefaktu (pavyzdziu, mirksejimo akimis) atmetimui;
-% <a href="matlab:helpwin Epochavimas_ir_atrinkimas7">Epochavimas_ir_atrinkimas7</a> - i ja kreipiasi <a href="matlab:helpwin pop_Epochavimas_ir_atrinkimas">pop_Epochavimas_ir_atrinkimas</a>;
-% <a href="matlab:helpwin eksportuoti_ragu_programai">eksportuoti_ragu_programai</a> - eksportuojant i Ragu naudojama <a href="matlab:load RaguMontage62.mat">RaguMontage62.mat</a> kanalu schema;
+% <a href="matlab:helpwin atmest_pg_amplit">atmest_pg_amplit</a> - artefaktų (pavyzdžių, mirksėjimo akimis) atmetimui;
+% <a href="matlab:helpwin Epochavimas_ir_atrinkimas7">Epochavimas_ir_atrinkimas7</a> - į ją kreipiasi <a href="matlab:helpwin pop_Epochavimas_ir_atrinkimas">pop_Epochavimas_ir_atrinkimas</a>;
+% <a href="matlab:helpwin eksportuoti_ragu_programai">eksportuoti_ragu_programai</a> - eksportuojant į Ragu naudojama <a href="matlab:load RaguMontage62.mat">RaguMontage62.mat</a> kanalų schema;
 %
 %
-% Kitos naudingos Darbeliu funkcijos:
+% Kitos naudingos Darbelių funkcijos:
 % --
-% <a href="matlab:helpwin lokaliz">lokaliz</a> - programelese matomo teksto vertimas; saugomas <a href="matlab:load lokaliz.mat">lokaliz.mat</a>;
-% <a href="matlab:helpwin atnaujinimas">atnaujinimas</a> - EEGLAB papildiniu (numatytuoju atveju - Darbeliu) diegimas/atnaujinimas;
-% <a href="matlab:helpwin ragu_diegimas">ragu_diegimas</a> - EEGLAB skirto Ragu papildinio parsiuntimas i idiegimas;
-% <a href="matlab:helpwin EEG_spektr_galia">EEG_spektr_galia</a> - spektras, absoliucios ir santykines galios dazniu srityse;
-% <a href="matlab:helpwin eeg_ivykiu_sarasas">eeg_ivykiu_sarasas</a> - vienos rinkmenos ivykiai arba rinkmenu saraso visi ir bendri ivykiai atskiruose sarasuose;
-% <a href="matlab:helpwin eeg_kanalu_sarasas">eeg_kanalu_sarasas</a> - vienos rinkmenos kanalai arba rinkmenu saraso visi ir bendri kanalai atskiruose sarasuose;
-% <a href="matlab:helpwin filter_filenames">filter_filenames</a> - rinkmenu paieska; igalina dirbti poaplankiuose;
-% <a href="matlab:helpwin merge_cells">merge_cells</a> - lenteliu, turinciu bendru antrasciu, apjungimui;
-% <a href="matlab:helpwin Pranesk_apie_klaida">Pranesk_apie_klaida</a> - issamus ispejimas po klaidos;
-% <a href="matlab:helpwin Tikras_Kelias">Tikras_Kelias</a> - jei nurodytas kelias neegzistuoja - grazina veikiamaji;
-% <a href="matlab:helpwin atrinkti_teksta">atrinkti_teksta</a> - tekstu arba rinkmenu saraso atranka pagal atrankos filtra;
-% <a href="matlab:helpwin ERP_savybes">ERP_savybes</a> - atlieka dali <a href="matlab:helpwin pop_ERP_savybes">pop_ERP_savybes</a> darbo;
-% <a href="matlab:helpwin labchartEKGevent2eeglab">labchartEKGevent2eeglab</a> - LabChart EKG ivykiu eksportavimas;
+% <a href="matlab:helpwin lokaliz">lokaliz</a> - programėlėse matomo teksto vertimas; saugomas <a href="matlab:load lokaliz.mat">lokaliz.mat</a>;
+% <a href="matlab:helpwin atnaujinimas">atnaujinimas</a> - EEGLAB papildinių (numatytuoju atveju - „Darbelių“) diegimas/atnaujinimas;
+% <a href="matlab:helpwin ragu_diegimas">ragu_diegimas</a> - EEGLAB skirto „Ragu“ papildinio parsiuntimas į įdiegimas;
+% <a href="matlab:helpwin EEG_spektr_galia">EEG_spektr_galia</a> - spektras, absoliučios ir santykinės galios dažnių srityse;
+% <a href="matlab:helpwin eeg_ivykiu_sarasas">eeg_ivykiu_sarasas</a> - vienos rinkmenos įvykiai arba rinkmenų sąrašo visi ir bendri įvykiai atskiruose sąrašuose;
+% <a href="matlab:helpwin eeg_kanalu_sarasas">eeg_kanalu_sarasas</a> - vienos rinkmenos kanalai arba rinkmenų sąrašo visi ir bendri kanalai atskiruose sąrašuose;
+% <a href="matlab:helpwin filter_filenames">filter_filenames</a> - rinkmenų paieška; įgalina dirbti poaplankiuose;
+% <a href="matlab:helpwin merge_cells">merge_cells</a> - lentelių, turinčių bendrų antraščių, apjungimui;
+% <a href="matlab:helpwin Pranesk_apie_klaida">Pranesk_apie_klaida</a> - išsamus įspėjimas po klaidos;
+% <a href="matlab:helpwin Tikras_Kelias">Tikras_Kelias</a> - jei nurodytas kelias neegzistuoja - grąžina veikiamąjį;
+% <a href="matlab:helpwin atrinkti_teksta">atrinkti_teksta</a> - tekstų arba rinkmenų sąrašo atranka pagal atrankos filtrą;
+% <a href="matlab:helpwin ERP_savybes">ERP_savybes</a> - atlieka dalį <a href="matlab:helpwin pop_ERP_savybes">pop_ERP_savybes</a> darbo;
+% <a href="matlab:helpwin labchartEKGevent2eeglab">labchartEKGevent2eeglab</a> - LabChart EKG įvykių eksportavimas;
 %
 %
-% Kitos naudingos treciuju saliu originalios arba modifikuotos funkcijos:
+% Kitos naudingos trečiųjų šalių originalios arba modifikuotos funkcijos:
 % --
-% <a href="matlab:helpwin QRS_is_EEG">QRS_is_EEG</a> - QRS aptikimas, kai EKG yra tarp EEG kanalu;
+% <a href="matlab:helpwin QRS_is_EEG">QRS_is_EEG</a> - QRS aptikimas, kai EKG yra tarp EEG kanalų;
 % <a href="matlab:helpwin QRS_detekt">QRS_detekt</a> - QRS aptikimas signale (matlab kintamajame);
 % <a href="matlab:helpwin QRS_detekt_DPI">QRS_detekt_DPI</a> - Threshold-Independent QRS Detection Using the Dynamic Plosion Index;
 % <a href="matlab:helpwin QRS_detekt_fMRIb">QRS_detekt_fMRIb</a> - Detect QRS peaks from ECG channel using combined adaptive thresholding;
 % <a href="matlab:helpwin QRS_detekt_mobd">QRS_detekt_mobd</a> - Finds QRS complexes using nonlinear MOBD transformation;
 % <a href="matlab:helpwin QRS_detekt_Pan_Tompkin">QRS_detekt_Pan_Tompkin</a> - Complete implementation of Pan-Tompkins algorithm;
-% <a href="matlab:helpwin convert_file_encoding">convert_file_encoding</a> - rasmenu koduotes keitimas;
-% <a href="matlab:helpwin scrollplot2">scrollplot2</a> - truputi modifikuota Yair M. Altman programa slinktukui;
+% <a href="matlab:helpwin convert_file_encoding">convert_file_encoding</a> - rašmenų koduotės keitimas;
+% <a href="matlab:helpwin scrollplot2">scrollplot2</a> - truputį modifikuota Yair M. Altman programa slinktukui;
 %
 %
-% Pasenusios Darbeliu funkcijos:
+% Pasenusios Darbelių funkcijos:
 % --
-% <a href="matlab:helpwin pop_erp_area">pop_erp_area</a> - ERP plotas, pusplotis, minimumas, maksimumas; naudokite <a href="matlab:helpwin pop_ERP_savybes">pop_ERP_savybes</a>; 
-% <a href="matlab:helpwin erp_area">erp_area</a> - atlieka dali <a href="matlab:helpwin pop_erp_area">pop_erp_area</a> darbo; naudokite <a href="matlab:helpwin ERP_savybes">ERP_savybes</a>;
-% <a href="matlab:helpwin pop_naujas">pop_naujas</a> - sablonas naujoms grafinems funkcijoms;
+% <a href="matlab:helpwin pop_erp_area">pop_erp_area</a> - ERP plotas, pusplotis, minimumas, maksimumas; naudokite <a href="matlab:helpwin pop_ERP_savybes">pop_ERP_savybes</a>;
+% <a href="matlab:helpwin erp_area">erp_area</a> - atlieka dalį <a href="matlab:helpwin pop_erp_area">pop_erp_area</a> darbo; naudokite <a href="matlab:helpwin ERP_savybes">ERP_savybes</a>;
+% <a href="matlab:helpwin pop_naujas">pop_naujas</a> - šablonas naujoms grafinėms funkcijoms;
 % <a href="matlab:helpwin pop_atnaujinimas_">pop_atnaujinimas_</a> - paprastesnis atnaujinimo dialogas nei <a href="matlab:helpwin pop_atnaujinimas">pop_atnaujinimas</a>;
 %
 %
 % Kita:
 % --
-% *.fig - grafines sasajos objektai;
+% *.fig - grafinės sąsajos objektai;
 % <a href="matlab:helpwin _eegplugin_darbeliai">_eegplugin_darbeliai</a> - <a href="matlab:helpwin eegplugin_darbeliai">eegplugin_darbeliai</a> UTF-8 kopija;
-% <a href="matlab:edit Darbeliai.versija">Darbeliai.versija</a> - Darbeliu versijos numeris;
-% <a href="matlab:edit LICENSE_GPL-3.0.txt">LICENSE_GPL-3.0.txt</a> - GNU viesoji licencija (trecioji versija, anglu kalba);
-% <a href="matlab:helpwin darbeliu_istorija">darbeliu_istorija</a> - Programos pakeitimai. Kas nauja sioje versijoje?
+% <a href="matlab:edit Darbeliai.versija">Darbeliai.versija</a> - „Darbelių“ versijos numeris;
+% <a href="matlab:edit LICENSE_GPL-3.0.txt">LICENSE_GPL-3.0.txt</a> - GNU viešoji licencija (trečioji versija, anglų kalba);
+% <a href="matlab:helpwin darbeliu_istorija">darbeliu_istorija</a> - Programos pakeitimai. Kas nauja šioje versijoje?
 %
 %
-% Galima pasirinkti lietuviu arba anglu kalba. 
-% Prisiderinama prie naudojamos koduotes: 
-% UTF-8 aplanko *.m rinkmenos konvertuojamos i sistemos koduote.
+% Galima pasirinkti lietuvių arba anglų kalbą.
+% Prisiderinama prie naudojamos koduotės:
+% UTF-8 aplanko *.m rinkmenos konvertuojamos į sistemos koduotę.
 %
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-% (C) 2014-2024 Mindaugas Baranauskas   
+% (C) 2014-2024 Mindaugas Baranauskas
 %
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%
 %
-% Si programa yra laisva. Jus galite ja platinti ir/arba modifikuoti
+% Ši programa yra laisva. Jūs galite ją platinti ir/arba modifikuoti
 % remdamiesi Free Software Foundation paskelbtomis GNU Bendrosios
-% Viesosios licencijos salygomis: 3 licencijos versija, arba (savo
-% nuoziura) bet kuria velesne versija.
+% Viešosios licencijos sąlygomis: 3 licencijos versija, arba (savo
+% nuožiūra) bet kuria vėlesne versija.
 %
-% Si programa platinama su viltimi, kad ji bus naudinga, bet BE JOKIOS
-% GARANTIJOS; taip pat nesuteikiama jokia numanoma garantija del TINKAMUMO
-% PARDUOTI ar PANAUDOTI TAM TIKRAM TIKSLU. Daugiau informacijos galite 
-% rasti pacioje GNU Bendrojoje Viesojoje licencijoje.
+% Ši programa platinama su viltimi, kad ji bus naudinga, bet BE JOKIOS
+% GARANTIJOS; taip pat nesuteikiama jokia numanoma garantija dėl TINKAMUMO
+% PARDUOTI ar PANAUDOTI TAM TIKRAM TIKSLU. Daugiau informacijos galite
+% rasti pačioje GNU Bendrojoje Viešojoje licencijoje.
 %
-% Jus kartu su sia programa turejote gauti ir GNU Bendrosios Viesosios
-% licencijos kopija; jei ne - zr. <https://www.gnu.org/licenses/>.
+% Jūs kartu su šia programa turėjote gauti ir GNU Bendrosios Viešosios
+% licencijos kopiją; jei ne - žr. <https://www.gnu.org/licenses/>.
 %
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
@@ -120,7 +120,7 @@ main_menu_name ='Darbeliai';
 vers = 'Darbeliai v?';
 config_file='Darbeliai_config.mat';
 if ~isempty(which('eeglab'))
-    % Atsargine konfiguracija EEGLAB/plugins kataloge su .bak" priesaga
+    % Atsarginė konfigūracija EEGLAB/plugins kataloge su „.bak" priesaga
     backup_file = fullfile(fileparts(which('eeglab')),'plugins', 'Darbeliai_config.bak');
 else
     backup_file = Tikras_kelias(fullfile(curdir, '..', 'Darbeliai_config.bak'));
@@ -128,11 +128,11 @@ end
 kelias=pwd;
 
 try
-   fid_vers=fopen(fullfile(curdir,'Darbeliai.versija'));
-   vers=regexprep(regexprep(fgets(fid_vers),'[ ]*\n',''),'[ ]*\r','');
-   fclose(fid_vers); 
+    fid_vers=fopen(fullfile(curdir,'Darbeliai.versija'));
+    vers=regexprep(regexprep(fgets(fid_vers),'[ ]*\n',''),'[ ]*\r','');
+    fclose(fid_vers);
 catch err;
-  disp(err.message);
+    disp(err.message);
 end;
 
 clear('lokaliz');
@@ -140,7 +140,7 @@ clear('lokaliz');
 % EEGLAB klaida naudojant su  MATLAB R2015b: updatemenu:1398
 warning('off','MATLAB:lang:cannotClearExecutingFunction');
 
-% Pabandyti perkelti kitas sios programeles versijas kitur
+% Pabandyti perkelti kitas šios programėlės versijas kitur
 wb=warning('off','MATLAB:rmpath:DirNotFound');
 rmpath(curdir);
 if strcmp(curdir(1:(end-1)),pwd); cd('..') ; end;
@@ -149,16 +149,16 @@ path_deactivated=[fileparts(which('eeglab')) filesep 'deactivatedplugins' filese
 rmpath(genpath(path_deactivated));
 path_deactivated_i=length(path_deactivated) - 1;
 if length(pwd) >= path_deactivated_i ;
-   if strcmp(curdir(1:path_deactivated_i),path_deactivated(1:end-1));
-      cd(fileparts(which('eeglab')));
-   end;
+    if strcmp(curdir(1:path_deactivated_i),path_deactivated(1:end-1));
+        cd(fileparts(which('eeglab')));
+    end;
 end;
 if length(curdir) >= path_deactivated_i;
-   if strcmp(curdir(1:path_deactivated_i),path_deactivated(1:end-1));
-      cd(fileparts(which('eeglab')));
-      warning(wb.state,'MATLAB:rmpath:DirNotFound');
-      return;
-   end;
+    if strcmp(curdir(1:path_deactivated_i),path_deactivated(1:end-1));
+        cd(fileparts(which('eeglab')));
+        warning(wb.state,'MATLAB:rmpath:DirNotFound');
+        return;
+    end;
 end;
 [dublik,~,~]=fileparts(which(mfilename));
 while ~isempty(dublik);
@@ -193,24 +193,24 @@ else
     encoding = get(0,'language');
 end;
 
-if strcmp(curdir(end),filesep); 
-   curdir=curdir(1:end-1);
+if strcmp(curdir(end),filesep);
+    curdir=curdir(1:end-1);
 end ;
 curdir_sep=find(ismember(curdir,filesep));
 curdir_parrent=curdir(1:curdir_sep(end));
-% Konfiguracijos atstatymas is atsargines kopijos uz Darbeliu katalogo ribu - nes ji dingsta atnaujinant per EEGLAB
+% Konfigūracijos atstatymas iš atsarginės kopijos už Darbelių katalogo ribų - nes ji dingsta atnaujinant per EEGLAB
 if exist(fullfile(curdir_parrent, config_file),'file') == 2
-   % Grazinti laikinai iskelta konfiguracija i pagrindine vieta
-   try movefile(fullfile(curdir_parrent, config_file), fullfile(curdir, config_file), 'f');
-   catch
-   end
+    % Grąžinti laikinai iškeltą konfigūraciją į pagrindinę vietą
+    try movefile(fullfile(curdir_parrent, config_file), fullfile(curdir, config_file), 'f');
+    catch
+    end
 elseif (exist(fullfile(curdir, config_file),'file') ~= 2) && (exist(backup_file,'file') == 2)
-    % Atkopijuoti atsargine konfiguracija
+    % Atkopijuoti atsarginę konfigūraciją
     try copyfile(backup_file, fullfile(curdir, config_file), 'f')
     catch
     end
 end
-% Jei atsargines konfiguracijos kopijos nera - sukurti
+% Jei atsarginės konfigūracijos kopijos nėra - sukurti
 if (exist(fullfile(curdir, config_file),'file') == 2) && (exist(backup_file,'file') ~= 2)
     try copyfile(fullfile(curdir, config_file), backup_file, 'f')
     catch
@@ -220,26 +220,26 @@ curdir=[curdir filesep];
 
 
 % Atnaujinti eegplot_w1.1.2 > eegplot_w1.1.3
-if 0; % istrinkite sia eilute ir atkomentuokite tolesne
-%if exist(fullfile(curdir,'external','pop_eegplot_w.m'),'file') == 2 || ...
-   exist(fullfile(curdir,'external','eegplot_w.m'),'file') == 2
-   eeglab_plugins_dir=fileparts(fileparts(curdir));
+if 0; % ištrinkite šią eilutę ir atkomentuokite tolesnę
+    %if exist(fullfile(curdir,'external','pop_eegplot_w.m'),'file') == 2 || ...
+    exist(fullfile(curdir,'external','eegplot_w.m'),'file') == 2
+    eeglab_plugins_dir=fileparts(fileparts(curdir));
 
-   if exist(fullfile(eeglab_plugins_dir,'eegplot_w1.1.2','eegplugin_eegplot_w.m'),'file') == 2 || ...
-      exist(fullfile(eeglab_plugins_dir,'eegplot_w1.1.2','pop_eegplot_w.m'),'file') == 2 || ...
-      exist(fullfile(eeglab_plugins_dir,'eegplot_w1.1.2','eegplot_w.m'),'file') == 2
+    if exist(fullfile(eeglab_plugins_dir,'eegplot_w1.1.2','eegplugin_eegplot_w.m'),'file') == 2 || ...
+            exist(fullfile(eeglab_plugins_dir,'eegplot_w1.1.2','pop_eegplot_w.m'),'file') == 2 || ...
+            exist(fullfile(eeglab_plugins_dir,'eegplot_w1.1.2','eegplot_w.m'),'file') == 2
 
-      try movefile(fullfile(eeglab_plugins_dir,'eegplot_w1.1.2'),fullfile(eeglab_plugins_dir,'eegplot_w1.1.3'),'f');
-          movefile(fullfile(curdir,'external','pop_eegplot_w.m'),fullfile(eeglab_plugins_dir,'eegplot_w1.1.3'),'f');
-          movefile(fullfile(curdir,'external','eegplot_w.m'),fullfile(eeglab_plugins_dir,'eegplot_w1.1.3'),'f');
-          addpath(fullfile(eeglab_plugins_dir,'eegplot_w1.1.3'));
-          eegplugin_eegplot_w(fig,try_strings,catch_strings);
-      catch
-      end
-   elseif size(which ('pop_eegplot_w','-all'),1) > 1 && size(which ('eegplot_w','-all'),1) > 1
-       try delete(fullfile(curdir,'external','pop_eegplot_w.m')); catch; end
-       try delete(fullfile(curdir,'external','eegplot_w.m')); catch; end
-   end
+        try movefile(fullfile(eeglab_plugins_dir,'eegplot_w1.1.2'),fullfile(eeglab_plugins_dir,'eegplot_w1.1.3'),'f');
+            movefile(fullfile(curdir,'external','pop_eegplot_w.m'),fullfile(eeglab_plugins_dir,'eegplot_w1.1.3'),'f');
+            movefile(fullfile(curdir,'external','eegplot_w.m'),fullfile(eeglab_plugins_dir,'eegplot_w1.1.3'),'f');
+            addpath(fullfile(eeglab_plugins_dir,'eegplot_w1.1.3'));
+            eegplugin_eegplot_w(fig,try_strings,catch_strings);
+        catch
+        end
+    elseif size(which ('pop_eegplot_w','-all'),1) > 1 && size(which ('eegplot_w','-all'),1) > 1
+        try delete(fullfile(curdir,'external','pop_eegplot_w.m')); catch; end
+        try delete(fullfile(curdir,'external','eegplot_w.m')); catch; end
+    end
 end
 
 
@@ -249,44 +249,44 @@ Darbeliai_nuostatos.diegti_auto=0;
 Darbeliai_konfig_vers='?';
 Darbeliai_nuostatos.stabili_versija=0;
 Darbeliai_nuostatos.savita_versija=0;
-Darbeliai_nuostatos.url_atnaujinimui='https://github.com/embar-/eeglab_darbeliai/archive/master.zip';
-Darbeliai_nuostatos.url_versijai='https://raw.githubusercontent.com/embar-/eeglab_darbeliai/master/Darbeliai.versija';
+Darbeliai_nuostatos.url_atnaujinimui='https://github.com/Metanome/eeglab-darbeliai/archive/dev.zip';
+Darbeliai_nuostatos.url_versijai='https://raw.githubusercontent.com/Metanome/eeglab-darbeliai/dev/Darbeliai.versija';
 Darbeliai_nuostatos.meniu_ragu=1;
 
 try
-   load(fullfile(curdir,config_file), 'Darbeliai', '-mat');
-   Darbeliai_nuostatos.lokale=Darbeliai.nuostatos.lokale;
-   Darbeliai_nuostatos.tikrinti_versija=Darbeliai.nuostatos.tikrinti_versija;
-   Darbeliai_nuostatos.diegti_auto=Darbeliai.nuostatos.diegti_auto;
-   Darbeliai_nuostatos.url_atnaujinimui=Darbeliai.nuostatos.url_atnaujinimui;
-   Darbeliai_nuostatos.url_versijai=Darbeliai.nuostatos.url_versijai;
-   Darbeliai_nuostatos.stabili_versija=Darbeliai.nuostatos.stabili_versija;
-   Darbeliai_nuostatos.meniu_ragu=Darbeliai.nuostatos.meniu_ragu;
-   Darbeliai_nuostatos.savita_versija=Darbeliai.nuostatos.savita_versija;
-   Darbeliai_konfig_vers=Darbeliai.konfig_vers;
+    load(fullfile(curdir,config_file), 'Darbeliai', '-mat');
+    Darbeliai_nuostatos.lokale=Darbeliai.nuostatos.lokale;
+    Darbeliai_nuostatos.tikrinti_versija=Darbeliai.nuostatos.tikrinti_versija;
+    Darbeliai_nuostatos.diegti_auto=Darbeliai.nuostatos.diegti_auto;
+    Darbeliai_nuostatos.url_atnaujinimui=Darbeliai.nuostatos.url_atnaujinimui;
+    Darbeliai_nuostatos.url_versijai=Darbeliai.nuostatos.url_versijai;
+    Darbeliai_nuostatos.stabili_versija=Darbeliai.nuostatos.stabili_versija;
+    Darbeliai_nuostatos.meniu_ragu=Darbeliai.nuostatos.meniu_ragu;
+    Darbeliai_nuostatos.savita_versija=Darbeliai.nuostatos.savita_versija;
+    Darbeliai_konfig_vers=Darbeliai.konfig_vers;
 catch err;
-   %disp(err.message);
+    %disp(err.message);
 end;
-lc=Darbeliai_nuostatos.lokale;    
+lc=Darbeliai_nuostatos.lokale;
 if ~isempty(lc{1});
-   try java.util.Locale.setDefault(java.util.Locale(lc(1),lc(2),lc(3))); catch; end;
+    try java.util.Locale.setDefault(java.util.Locale(lc(1),lc(2),lc(3))); catch; end;
 end;
 
 %encoding='windows-1257';
-disp([' Koduote: ' encoding]);
+disp([' Koduotė: ' encoding]);
 utfdir=[curdir 'UTF-8' filesep ];
 encdir=[curdir encoding filesep ];
 olddir=[curdir '___' filesep ];
 
-try 
+try
     if ismember(path,olddir);
         rmpath(olddir);
     end;
 catch err;
 end;
 
-% Pagrindiniame kataloge neturi buti rinkmenu, dubliuojanciu utfdir kataloge esancias
-% Files in utfdir should not dublicate main dir files (if any) 
+% Pagrindiniame kataloge neturi būti rinkmenų, dubliuojančių utfdir kataloge esančias
+% Files in utfdir should not dublicate main dir files (if any)
 if exist(utfdir,'dir') == 7;
     utf_f=dir([ utfdir '*.m' ]);
     utf_f_pav={utf_f.name};
@@ -294,7 +294,7 @@ if exist(utfdir,'dir') == 7;
         f=utf_f_pav{fi};
         if exist([curdir f ],'file') == 2;
             %disp([ ' ' f ' ' lokaliz('moving_file') ' ' lokaliz('into') olddir '...']);
-            if ~(exist(olddir,'dir') == 7); 
+            if ~(exist(olddir,'dir') == 7);
                 mkdir(olddir);
             end;
             movefile([curdir f ], [olddir f ], 'f');
@@ -302,7 +302,7 @@ if exist(utfdir,'dir') == 7;
     end;
 end;
 
-% Jei naudojama ne unikodo (UTF-8) koduote, konvertuoti unikodo failus
+% Jei naudojama ne unikodo (UTF-8) koduotė, konvertuoti unikodo failus
 if strcmp(encoding,'UTF-8');
     if exist(utfdir,'dir') == 7;
         addpath(utfdir);
@@ -314,7 +314,7 @@ if strcmp(encoding,'UTF-8');
         if exist([utfdir [ '_' f ] ],'file') == 2;
             copyfile([utfdir '_' f ],[curdir f ],'f');
         end;
-    end;    
+    end;
 else
     try
         if ismember(path,utfdir);
@@ -332,7 +332,7 @@ else
         if exist(utfdir,'dir') == 7;
             utf_f=dir([ utfdir '*.m' ]);
             utf_f_pav={utf_f.name};
-            
+
             mkdir(encdir);
             for fi=1:length(utf_f_pav);
                 f=utf_f_pav{fi};
@@ -354,89 +354,89 @@ else
 end;
 
 if and((exist('atnaujinimas.m','file') == 2),...
-   and(~isempty(Darbeliai_nuostatos.url_versijai),...
-       ~isempty(Darbeliai_nuostatos.url_atnaujinimui))) ;
-       
-   nauja_versija='';
-   status=0;
-   apie_vers='';
-   
-   if Darbeliai_nuostatos.tikrinti_versija ;
-      disp([main_menu_name ': ' lokaliz('Checking for updates...')]);
-      [filestr,status] = urlwrite(Darbeliai_nuostatos.url_versijai,fullfile(tempdir,'Darbeliai_versija1.txt'));
-   end;
-   if status
-       convert_file_encoding(filestr, [filestr '~'], 'UTF-8', encoding );
-       fid_nvers=fopen([filestr '~']);
-       nauja_versija=regexprep(regexprep(fgets(fid_nvers),'[ ]*\n',''),'[ ]*\r','');
-       %disp(size(nauja_versija));
-       apie_vers_='';
-       while ischar(apie_vers_);
-           apie_vers=[apie_vers apie_vers_];
-           apie_vers_ = fgets(fid_vers);
-       end;
-       fclose(fid_nvers); 
-       try delete(filestr); catch; end;
-       try delete([filestr '~']); catch; end;
-   end;	
-   
-   if and(~isempty(nauja_versija),~strcmp(nauja_versija,vers));
-      disp([lokaliz('Rasta nauja versija') ': ' nauja_versija]);
-      url_atnaujinimui=Darbeliai_nuostatos.url_atnaujinimui;
-      
-      % Jei sutampa rasta versija su paskiausia per GIT isleista versija, naudoti pastaraja
-      try git_latest=github_darbeliu_versijos(1);
-          [filestr,status] = urlwrite(git_latest.url_versijai,fullfile(tempdir,'Darbeliai_versija2.txt'));
-          if status;
-              convert_file_encoding(filestr, [filestr '~'], 'UTF-8', encoding );
-              fid_nvers=fopen([filestr '~']);
-              nauja_versija2=regexprep(regexprep(fgets(fid_nvers),'[ ]*\n',''),'[ ]*\r','');
-              fclose(fid_nvers);
-              try delete(filestr); catch; end;
-              try delete([filestr '~']); catch; end;
-              if strcmp(nauja_versija,nauja_versija2) ...
-                 && isequal(Darbeliai_nuostatos.stabili_versija,git_latest.stabili_versija);
-                  url_atnaujinimui=git_latest.url_atnaujinimui;
-                  %apie_vers=git_latest.komentaras;
-              end;
-          end;
-      catch
-      end;
-      
-      disp(regexprep(apie_vers,'\r','')); disp(' ');
-      if Darbeliai_nuostatos.diegti_auto;
-          close([...
-              findobj('-regexp','name','EEGLAB*')
-              findobj('-regexp','name','konfig')]);
-          clear functions;
-          atnaujinimas(url_atnaujinimui) ;
-          disp(' ');
-          warning(lokaliz('Please ignore error afer EEGLAB error plugin update.'));
-          figure;
-          h=gcf;
-          close(h);
-          return;
-      else
-          h=gcf;
-          %msgbox(Tekstas, lokaliz('Nauja versija'));
-          pop_atnaujinimas([],vers,nauja_versija,apie_vers);          
-          %disp([h gcf]);
-          figure(h);
-      end;
-   end;     
-   
+        and(~isempty(Darbeliai_nuostatos.url_versijai),...
+        ~isempty(Darbeliai_nuostatos.url_atnaujinimui))) ;
+
+    nauja_versija='';
+    status=0;
+    apie_vers='';
+
+    if Darbeliai_nuostatos.tikrinti_versija ;
+        disp([main_menu_name ': ' lokaliz('Checking for updates...')]);
+        [filestr,status] = urlwrite(Darbeliai_nuostatos.url_versijai,fullfile(tempdir,'Darbeliai_versija1.txt'));
+    end;
+    if status
+        convert_file_encoding(filestr, [filestr '~'], 'UTF-8', encoding );
+        fid_nvers=fopen([filestr '~']);
+        nauja_versija=regexprep(regexprep(fgets(fid_nvers),'[ ]*\n',''),'[ ]*\r','');
+        %disp(size(nauja_versija));
+        apie_vers_='';
+        while ischar(apie_vers_);
+            apie_vers=[apie_vers apie_vers_];
+            apie_vers_ = fgets(fid_vers);
+        end;
+        fclose(fid_nvers);
+        try delete(filestr); catch; end;
+        try delete([filestr '~']); catch; end;
+    end;
+
+    if and(~isempty(nauja_versija),~strcmp(nauja_versija,vers));
+        disp([lokaliz('Rasta nauja versija') ': ' nauja_versija]);
+        url_atnaujinimui=Darbeliai_nuostatos.url_atnaujinimui;
+
+        % Jei sutampa rasta versija su paskiausia per GIT išleista versija, naudoti pastarąją
+        try git_latest=github_darbeliu_versijos(1);
+            [filestr,status] = urlwrite(git_latest.url_versijai,fullfile(tempdir,'Darbeliai_versija2.txt'));
+            if status;
+                convert_file_encoding(filestr, [filestr '~'], 'UTF-8', encoding );
+                fid_nvers=fopen([filestr '~']);
+                nauja_versija2=regexprep(regexprep(fgets(fid_nvers),'[ ]*\n',''),'[ ]*\r','');
+                fclose(fid_nvers);
+                try delete(filestr); catch; end;
+                try delete([filestr '~']); catch; end;
+                if strcmp(nauja_versija,nauja_versija2) ...
+                        && isequal(Darbeliai_nuostatos.stabili_versija,git_latest.stabili_versija);
+                    url_atnaujinimui=git_latest.url_atnaujinimui;
+                    %apie_vers=git_latest.komentaras;
+                end;
+            end;
+        catch
+        end;
+
+        disp(regexprep(apie_vers,'\r','')); disp(' ');
+        if Darbeliai_nuostatos.diegti_auto;
+            close([...
+                findobj('-regexp','name','EEGLAB*')
+                findobj('-regexp','name','konfig')]);
+            clear functions;
+            atnaujinimas(url_atnaujinimui) ;
+            disp(' ');
+            warning(lokaliz('Please ignore error afer EEGLAB error plugin update.'));
+            figure;
+            h=gcf;
+            close(h);
+            return;
+        else
+            h=gcf;
+            %msgbox(Tekstas, lokaliz('Nauja versija'));
+            pop_atnaujinimas([],vers,nauja_versija,apie_vers);
+            %disp([h gcf]);
+            figure(h);
+        end;
+    end;
+
 end;
 
-% Ieskoti Ragu
+% Ieškoti Ragu
 if ~(exist('Ragu.m','file') == 2 ) ;
     eeglab_plugin_dir=([ fileparts(which('eeglab')) filesep 'plugins' filesep ]);
-    
+
     gal_ragu=filter_filenames([eeglab_plugin_dir '*' filesep 'Ragu.m;']);
     if ~isempty(gal_ragu) ; addpath(fileparts(gal_ragu{1}));   end;
-    
+
     gal_ragu=filter_filenames([eeglab_plugin_dir '*' filesep '*' filesep 'Ragu.m;']);
-    if ~isempty(gal_ragu) ; 
-        addpath(fileparts(gal_ragu{1}));   
+    if ~isempty(gal_ragu) ;
+        addpath(fileparts(gal_ragu{1}));
         addpath([(fileparts(gal_ragu{1} )) filesep '..']);
     end;
 end;
@@ -446,7 +446,7 @@ on='startup:on;study:on';
 W_MAIN = findobj('tag','EEGLAB');
 darbeliai_m = uimenu( W_MAIN, 'label', main_menu_name, 'tag', 'darbeliai', 'userdata', on);
 
-% Pameginti perkelti i priespaskutine pozicija
+% Pamėginti perkelti į priešpaskutinę poziciją
 try
     nitems = get(darbeliai_m,'position');
     set(darbeliai_m,'position',nitems-1);
@@ -461,68 +461,68 @@ param_prad=[ ...
     '      darbeliu_param={} ; end; end; '] ;
 param_pab='(darbeliu_param{:}); ';
 uimenu( darbeliai_m, 'Label', lokaliz('Pervadinimas su info suvedimu'), ...
-        'Separator','off', 'userdata', on, 'Callback', ... 
-        [param_prad 'pop_pervadinimas' param_pab ] );
+    'Separator','off', 'userdata', on, 'Callback', ...
+    [param_prad 'pop_pervadinimas' param_pab ] );
 uimenu( darbeliai_m, 'Label', lokaliz('Nuoseklus apdorojimas'), ...
-        'Separator','off', 'userdata', on, 'Callback', ... 
-        [param_prad 'pop_nuoseklus_apdorojimas' param_pab ] );
+    'Separator','off', 'userdata', on, 'Callback', ...
+    [param_prad 'pop_nuoseklus_apdorojimas' param_pab ] );
 uimenu( darbeliai_m, 'Label', lokaliz('EEG + EKG'), ...
-        'Separator','off', 'userdata', on, 'Callback', ... 
-        [param_prad 'pop_QRS_i_EEG' param_pab ] );
+    'Separator','off', 'userdata', on, 'Callback', ...
+    [param_prad 'pop_QRS_i_EEG' param_pab ] );
 uimenu( darbeliai_m, 'Label', lokaliz('Epochavimas pg. stimulus ir atsakus'), ...
-        'Separator','off', 'userdata', on, 'Callback', ...
-        [param_prad 'pop_Epochavimas_ir_atrinkimas' param_pab ] );
+    'Separator','off', 'userdata', on, 'Callback', ...
+    [param_prad 'pop_Epochavimas_ir_atrinkimas' param_pab ] );
 uimenu( darbeliai_m, 'Label', lokaliz('ERP properties, export...'), ...
-        'Separator','off', 'userdata', on, 'Callback', ...
-        [param_prad 'pop_ERP_savybes' param_pab ] );
+    'Separator','off', 'userdata', on, 'Callback', ...
+    [param_prad 'pop_ERP_savybes' param_pab ] );
 uimenu( darbeliai_m, 'Label', [ lokaliz('EEG spektras ir galia') '...' ], ...
-        'Separator','off', 'userdata', on, 'Callback', ...
-        [param_prad 'pop_eeg_spektrine_galia' param_pab ] );
+    'Separator','off', 'userdata', on, 'Callback', ...
+    [param_prad 'pop_eeg_spektrine_galia' param_pab ] );
 uimenu( darbeliai_m, 'Label', lokaliz('Custom command') , ...
-        'Separator','off', 'userdata', on, 'Callback', ...
-        [param_prad 'pop_rankinis' param_pab ] );
+    'Separator','off', 'userdata', on, 'Callback', ...
+    [param_prad 'pop_rankinis' param_pab ] );
 uimenu( darbeliai_m, 'Label', lokaliz('Meta darbeliai...') , ...
-        'Separator','on', 'userdata', on, 'Callback', ...
-        [param_prad 'pop_meta_drb' param_pab ] );
+    'Separator','on', 'userdata', on, 'Callback', ...
+    [param_prad 'pop_meta_drb' param_pab ] );
 
 
-if Darbeliai_nuostatos.meniu_ragu ;          
-    if (exist('Ragu.m','file') == 2 ) ;          
+if Darbeliai_nuostatos.meniu_ragu ;
+    if (exist('Ragu.m','file') == 2 ) ;
         ragu_m = uimenu( darbeliai_m, 'Label', lokaliz('Ragu'), 'Separator','on', 'userdata', on);
     else
         Ragu_atnaujinimo_meniu_pavadinimas=lokaliz('Diegti Ragu');
         uimenu( darbeliai_m, 'Label', Ragu_atnaujinimo_meniu_pavadinimas, 'Separator','on', ...
             'foregroundcolor', 'b', 'userdata', on, 'Callback', ...
-             'ragu_diegimas ;'  );		
+            'ragu_diegimas ;'  );
     end;
 end;
 
 uimenu( darbeliai_m, 'Label', [lokaliz('Nuostatos') ' (kalba/language)'], ...
-        'separator','on', 'userdata', on, 'callback', ...
-         'konfig ;'  );
+    'separator','on', 'userdata', on, 'callback', ...
+    'konfig ;'  );
 
 
 if and(exist('atnaujinimas.m','file') == 2,...
-   and(~isempty(Darbeliai_nuostatos.url_versijai),...
-       ~isempty(Darbeliai_nuostatos.url_atnaujinimui))) ;      
-   if and(~isempty(nauja_versija),~strcmp(nauja_versija,vers));
-      Atnaujinimo_meniu_pavadinimas=[lokaliz('Atnaujinti iki') ' ' strrep(nauja_versija,'Darbeliai ','')];
-      Tekstas=[ lokaliz('Naudojate') ; vers '.' ; {' '} ];
-      Tekstas=[ Tekstas ; lokaliz('Rasta nauja versija') ': ' ; [nauja_versija '.'] ];
-      Tekstas=[ Tekstas ; ' ' ; lokaliz('Eikite meniu') ; main_menu_name ' -> ' Atnaujinimo_meniu_pavadinimas ;  ];
-      Tekstas=[ Tekstas ; lokaliz('ir atnaujinkite papildin!') ] ;       
-      h=gcf;
-      %msgbox(Tekstas, lokaliz('Nauja versija'));
-      uimenu( darbeliai_m, 'Label', Atnaujinimo_meniu_pavadinimas, ...
-          'separator','off', 'userdata', on, ...
-          'foregroundcolor', 'r', 'Callback', [ 'atnaujinimas ;' ] );
-      figure(h);
-   else
-      Atnaujinimo_meniu_pavadinimas=lokaliz('Check for updates');
-      uimenu( darbeliai_m, 'Label', Atnaujinimo_meniu_pavadinimas, ...
-      'separator','off', 'userdata', on, 'foregroundcolor', 'b', ...
-      'Callback',  'pop_atnaujinimas ;'  );    
-   end;
+        and(~isempty(Darbeliai_nuostatos.url_versijai),...
+        ~isempty(Darbeliai_nuostatos.url_atnaujinimui))) ;
+    if and(~isempty(nauja_versija),~strcmp(nauja_versija,vers));
+        Atnaujinimo_meniu_pavadinimas=[lokaliz('Atnaujinti iki') ' ' strrep(nauja_versija,'Darbeliai ','')];
+        Tekstas=[ lokaliz('Naudojate') ; vers '.' ; {' '} ];
+        Tekstas=[ Tekstas ; lokaliz('Rasta nauja versija') ': ' ; [nauja_versija '.'] ];
+        Tekstas=[ Tekstas ; ' ' ; lokaliz('Eikite meniu') ; main_menu_name ' -> ' Atnaujinimo_meniu_pavadinimas ;  ];
+        Tekstas=[ Tekstas ; lokaliz('ir atnaujinkite papildin!') ] ;
+        h=gcf;
+        %msgbox(Tekstas, lokaliz('Nauja versija'));
+        uimenu( darbeliai_m, 'Label', Atnaujinimo_meniu_pavadinimas, ...
+            'separator','off', 'userdata', on, ...
+            'foregroundcolor', 'r', 'Callback', [ 'atnaujinimas ;' ] );
+        figure(h);
+    else
+        Atnaujinimo_meniu_pavadinimas=lokaliz('Check for updates');
+        uimenu( darbeliai_m, 'Label', Atnaujinimo_meniu_pavadinimas, ...
+            'separator','off', 'userdata', on, 'foregroundcolor', 'b', ...
+            'Callback',  'pop_atnaujinimas ;'  );
+    end;
 end;
 
 
@@ -532,31 +532,31 @@ try LC_=[lc(1) ' ' lc(2)]; catch; end;
 try LC=javaObject ('java.util.Locale',''); LC_=LC.getDefault(); catch; end;
 disp([' Kalba: ' char(LC_) ]);
 if strcmp(LC_,'lt_LT');
-uimenu( darbeliai_m, 'Label',  [ lokaliz('Apie') ' ' vers ] , ...
-          'separator','off', 'userdata', on, 'callback', ...
-           'web(''https://github.com/embar-/eeglab_darbeliai/wiki/0.%20LT'',''-browser'') ;'  );
+    uimenu( darbeliai_m, 'Label',  [ lokaliz('Apie') ' ' vers ] , ...
+        'separator','off', 'userdata', on, 'callback', ...
+        'web(''https://github.com/embar-/eeglab_darbeliai/wiki/0.%20LT'',''-browser'') ;'  );
 else
-uimenu( darbeliai_m, 'Label',  [ lokaliz('Apie') ' ' vers ] , ...
-          'separator','off', 'userdata', on, 'callback', ...
-           'web(''https://github.com/embar-/eeglab_darbeliai/wiki/0.%20EN'',''-browser'') ;'  );           
+    uimenu( darbeliai_m, 'Label',  [ lokaliz('Apie') ' ' vers ] , ...
+        'separator','off', 'userdata', on, 'callback', ...
+        'web(''https://github.com/embar-/eeglab_darbeliai/wiki/0.%20EN'',''-browser'') ;'  );
 end;
 
 
 % RAGU meniu
 if and(Darbeliai_nuostatos.meniu_ragu,(exist('Ragu.m','file') == 2 )) ;
-%    uimenu( ragu_m, 'Label', lokaliz('Eksp Ragu'), ...
-%    'Separator','on', 'userdata', on, 'Callback', ...
-%         'eksportuoti_ragu_programai(ALLEEG, EEG, CURRENTSET) ;'  );
+    %    uimenu( ragu_m, 'Label', lokaliz('Eksp Ragu'), ...
+    %    'Separator','on', 'userdata', on, 'Callback', ...
+    %         'eksportuoti_ragu_programai(ALLEEG, EEG, CURRENTSET) ;'  );
     uimenu( ragu_m, 'Label', lokaliz('Atverti Ragu'), ...
-    'Separator','off', 'userdata', on, 'Callback', ...
-             'Ragu ;'  );
+        'Separator','off', 'userdata', on, 'Callback', ...
+        'Ragu ;'  );
     Ragu_atnaujinimo_meniu_pavadinimas=lokaliz('Bandyti atnaujinti Ragu');
     uimenu( ragu_m, 'Label', Ragu_atnaujinimo_meniu_pavadinimas, 'Separator','on', ...
         'foregroundcolor', 'b', 'userdata', on, 'Callback', ...
-         'ragu_diegimas ;'  );		
+        'ragu_diegimas ;'  );
 end;
 
-% Eksperimentine versija?
+% Eksperimentinė versija?
 if ~Darbeliai_nuostatos.stabili_versija ;
     warning('off','backtrace');
     warning(sprintf( [ '\n' vers ' ' lokaliz('Trunk version') '!\n' ...
@@ -567,13 +567,13 @@ end;
 
 return;
 
-% Svarbi informacija apie nauja versija
+% Svarbi informacija apie naują versiją
 if ~strcmp(Darbeliai_konfig_vers,vers);
-   Darbeliai.konfig_vers=vers;
-   save(fullfile(curdir,'Darbeliai_config.mat'),'Darbeliai');
-   h=gcf;
-   msgbox(['Sugrizo meniu punktas duomenu eksportavimui i RAGU; ' ...
-   'bet geriau naudokite SISP savybiu ir eksportavimo programele. ' ], ...
-   vers);
-   figure(h);
+    Darbeliai.konfig_vers=vers;
+    save(fullfile(curdir,'Darbeliai_config.mat'),'Darbeliai');
+    h=gcf;
+    msgbox(['Sugrįžo meniu punktas duomenų eksportavimui į RAGU; ' ...
+        'bet geriau naudokite SĮSP savybių ir eksportavimo programėlę. ' ], ...
+        vers);
+    figure(h);
 end;

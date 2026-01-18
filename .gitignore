@@ -14,3 +14,6 @@ ISO-8859-*/
 
 # MATLAB generated
 *.m~
+
+# Release artifacts
+Darbeliai*.zip
